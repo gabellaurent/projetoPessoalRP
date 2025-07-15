@@ -3,7 +3,7 @@ body {
     padding: 0;
     min-height: 100vh;
     font-family: 'Montserrat', Arial, sans-serif;
-    background: linear-gradient(#7eaaff 0%, #325fa1 100%);
+    background: linear-gradient(#bbd2ff 0%, #325fa1 100%);
     display: flex;
     flex-direction: column;
 }
@@ -25,14 +25,7 @@ body {
     border-radius: 6px;
     transition: background 0.2s, color 0.2s;
 }
-.navbar a.login {
-    border: 2px solid #fff;
-    background: transparent;
-}
-.navbar a.login:hover {
-    background: #fff;
-    color: #3b5b8c;
-}
+
 .container {
     flex: 1;
     display: flex;
