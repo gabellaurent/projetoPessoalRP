@@ -65,6 +65,7 @@
             font-size: 1.15rem;
             font-weight: 700;
             margin-bottom: 14px;
+            cursor: pointer;
         }
         .main-content {
             position: absolute;
@@ -192,6 +193,10 @@
     let lastSidebarState = '';
     async function listarUsuariosSidebar() {
         const sidebarUsers = document.getElementById('sidebar-users');
+        // Remove 'Carregando...' se existir
+        if (sidebarUsers.innerHTML.trim() === 'Carregando...') {
+            sidebarUsers.innerHTML = '';
+        }
         const { data, error } = await supabase
             .from('base-users')
             .select('username, lastActive');
@@ -204,42 +209,44 @@
             sidebarUsers.innerHTML = '<div style="color:#b8c7d1;">Nenhum usuário encontrado.</div>';
             return;
         }
-        // Separar online e offline com base no lastActive
         const now = Date.now();
-        const onlineUsers = data.filter(u => {
-            if (!u.lastActive) return false;
-            const lastActive = new Date(u.lastActive).getTime();
-            return (now - lastActive) < 70000;
+        // Cria um mapa do estado atual dos usuários
+        const userStates = {};
+        data.forEach(u => {
+            let online = false;
+            if (u.lastActive) {
+                const lastActive = new Date(u.lastActive).getTime();
+                online = (now - lastActive) < 70000;
+            }
+            userStates[u.username] = online ? 'online' : 'offline';
         });
-        const offlineUsers = data.filter(u => {
-            if (!u.lastActive) return true;
-            const lastActive = new Date(u.lastActive).getTime();
-            return (now - lastActive) >= 70000;
+        // Atualiza/adiciona/remover elementos do DOM conforme necessário
+        // Mantém ordem: online primeiro, depois offline
+        const sortedUsers = [
+            ...data.filter(u => userStates[u.username] === 'online'),
+            ...data.filter(u => userStates[u.username] === 'offline')
+        ];
+        // Cria um Set dos usernames atuais
+        const currentUsernames = new Set(sortedUsers.map(u => u.username));
+        // Remove elementos que não existem mais
+        Array.from(sidebarUsers.children).forEach(child => {
+            if (!currentUsernames.has(child.dataset.username)) {
+                sidebarUsers.removeChild(child);
+            }
         });
-        // Gera uma string representando o estado atual
-        const sidebarState = JSON.stringify({
-            online: onlineUsers.map(u => u.username),
-            offline: offlineUsers.map(u => u.username)
+        // Atualiza/adiciona cada usuário
+        // Remove todos os elementos antes de adicionar na ordem correta
+        Array.from(sidebarUsers.children).forEach(child => {
+            sidebarUsers.removeChild(child);
         });
-        // Só atualiza o DOM se houver mudança
-        if (sidebarState !== lastSidebarState) {
-            sidebarUsers.innerHTML = '';
-            onlineUsers.forEach(user => {
-                const div = document.createElement('div');
-                div.className = 'sidebar-user';
-                div.textContent = user.username;
-                div.style.color = '#fff';
-                sidebarUsers.appendChild(div);
-            });
-            offlineUsers.forEach(user => {
-                const div = document.createElement('div');
-                div.className = 'sidebar-user';
-                div.textContent = user.username;
-                div.style.color = '#b8c7d1';
-                sidebarUsers.appendChild(div);
-            });
-            lastSidebarState = sidebarState;
-        }
+        sortedUsers.forEach(user => {
+            let div = document.createElement('div');
+            div.className = 'sidebar-user';
+            div.dataset.username = user.username;
+            div.textContent = user.username;
+            div.style.color = userStates[user.username] === 'online' ? '#fff' : '#b8c7d1';
+            sidebarUsers.appendChild(div);
+        });
     }
     listarUsuariosSidebar();
 
@@ -274,7 +281,7 @@
     }, 60000);
 
     // Atualiza lastActive ao carregar a página (indica que o usuário entrou)
-    (async () => {
+    window.addEventListener('DOMContentLoaded', async () => {
         const username = localStorage.getItem('username');
         if (username) {
             const { data } = await supabase
@@ -289,6 +296,8 @@
                     .eq('id', data.id);
             }
         }
-    })();
+        // Atualiza a sidebar imediatamente após o heartbeat inicial
+        listarUsuariosSidebar();
+    });
     </script>
 </html>
