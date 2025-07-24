@@ -189,9 +189,9 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    let lastSidebarState = '';
     async function listarUsuariosSidebar() {
         const sidebarUsers = document.getElementById('sidebar-users');
-        sidebarUsers.innerHTML = 'Carregando...';
         const { data, error } = await supabase
             .from('base-users')
             .select('username, lastActive');
@@ -204,34 +204,42 @@
             sidebarUsers.innerHTML = '<div style="color:#b8c7d1;">Nenhum usuário encontrado.</div>';
             return;
         }
-        sidebarUsers.innerHTML = '';
         // Separar online e offline com base no lastActive
         const now = Date.now();
         const onlineUsers = data.filter(u => {
             if (!u.lastActive) return false;
             const lastActive = new Date(u.lastActive).getTime();
-            return (now - lastActive) < 70000; // 70 segundos
+            return (now - lastActive) < 70000;
         });
         const offlineUsers = data.filter(u => {
             if (!u.lastActive) return true;
             const lastActive = new Date(u.lastActive).getTime();
             return (now - lastActive) >= 70000;
         });
-        // Exibir online primeiro
-        onlineUsers.forEach(user => {
-            const div = document.createElement('div');
-            div.className = 'sidebar-user';
-            div.textContent = user.username;
-            div.style.color = '#fff';
-            sidebarUsers.appendChild(div);
+        // Gera uma string representando o estado atual
+        const sidebarState = JSON.stringify({
+            online: onlineUsers.map(u => u.username),
+            offline: offlineUsers.map(u => u.username)
         });
-        offlineUsers.forEach(user => {
-            const div = document.createElement('div');
-            div.className = 'sidebar-user';
-            div.textContent = user.username;
-            div.style.color = '#b8c7d1';
-            sidebarUsers.appendChild(div);
-        });
+        // Só atualiza o DOM se houver mudança
+        if (sidebarState !== lastSidebarState) {
+            sidebarUsers.innerHTML = '';
+            onlineUsers.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'sidebar-user';
+                div.textContent = user.username;
+                div.style.color = '#fff';
+                sidebarUsers.appendChild(div);
+            });
+            offlineUsers.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'sidebar-user';
+                div.textContent = user.username;
+                div.style.color = '#b8c7d1';
+                sidebarUsers.appendChild(div);
+            });
+            lastSidebarState = sidebarState;
+        }
     }
     listarUsuariosSidebar();
 
