@@ -83,9 +83,7 @@
     wrapper.innerHTML = `
       <div class="container">
         <h1>Chat em Tempo Real</h1>
-        <div class="user-box">
-          <input id="usuario" type="text" placeholder="Seu nome de usuário" maxlength="32" autocomplete="off" />
-        </div>
+        <!-- Campo de identificação removido, usuário será pego do localStorage -->
         <div class="chat-box">
           <ul id="chat" class="chat-list"></ul>
         </div>
@@ -104,7 +102,7 @@
 
     const chat = document.getElementById('chat');
     const chatBox = document.querySelector('.chat-box');
-    const usuarioInput = document.getElementById('usuario');
+    // const usuarioInput = document.getElementById('usuario'); // Removido
     const mensagemInput = document.getElementById('mensagem');
     const enviarBtn = document.getElementById('enviar');
 
@@ -135,32 +133,14 @@
     }
 
     async function enviarMensagem() {
-      const usuario = usuarioInput.value.trim();
+      const usuario = localStorage.getItem('username') || 'Usuário';
       const texto = mensagemInput.value.trim();
-      if (!usuario) {
-        usuarioInput.focus();
-        usuarioInput.classList.add('erro-usuario');
-        // Salva placeholder original
-        if (!usuarioInput.dataset.placeholder) {
-          usuarioInput.dataset.placeholder = usuarioInput.placeholder;
-        }
-        usuarioInput.placeholder = 'identifique-se aqui!';
-        setTimeout(() => {
-          usuarioInput.classList.remove('erro-usuario');
-          usuarioInput.placeholder = usuarioInput.dataset.placeholder || 'Seu nome de usuário';
-        }, 1800);
-        return;
-      }
       if (!texto) return;
       mensagemInput.value = '';
       await supabase.from('meu-chat').insert([{ usuario, texto }]);
       setTimeout(() => {
         if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
       }, 100);
-    // Destaque visual para campo de usuário vazio
-    var styleErro = document.createElement('style');
-    styleErro.innerHTML = '.erro-usuario { border: 2px solid #ff5555 !important; box-shadow: 0 0 0 2px #ff555588; }';
-    document.head.appendChild(styleErro);
     }
 
     enviarBtn.onclick = enviarMensagem;

@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Roleplay World</title>
+    <title>Meu Projeto</title>
     <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
     <style>
         body {
@@ -115,7 +115,7 @@
 </head>
 <body>
     <div class="navbar">
-        <span class="navbar-title">Roleplay World</span>
+        <span class="navbar-title">Meu projeto</span>
         <div class="navbar-search">
             <input type="text" placeholder="Pesquisar aqui..">
         </div>
@@ -136,9 +136,9 @@
         <div style="color:#b8c7d1;">Você não possui nenhuma notificação.</div>
     </div>
     <div class="profile-panel" id="profilePanel" style="display:none;">
-        <h2>Bem vindo<br><em>Usuário 1</em></h2>
+        <h2>Bem vindo<br><em id="profile-username">Usuário</em></h2>
         <a href="#">Settings</a>
-        <a href="#">Logout</a>
+        <a href="#" id="logout-btn">Logout</a>
     </div>
 </body>
     <script src="chat-embed.js"></script>
@@ -148,6 +148,9 @@
     const profilePanel = document.getElementById('profilePanel');
     const bellIcon = document.getElementById('bellIcon');
     const notificationPanel = document.getElementById('notificationPanel');
+    // Exibe o nome do usuário logado
+    const username = localStorage.getItem("username") || "Usuário";
+    document.getElementById("profile-username").textContent = username;
 
     userIcon.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -171,6 +174,13 @@
         if (notificationPanel.style.display === 'block' && !notificationPanel.contains(e.target) && e.target !== bellIcon && !bellIcon.contains(e.target)) {
             notificationPanel.style.display = 'none';
         }
+    });
+
+    // Botão de logout
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('username');
+        window.location.href = 'index.html';
     });
 
     // SUPABASE: Listar usuários na sidebar

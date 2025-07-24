@@ -82,6 +82,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const username = loginForm.querySelector('#loginUsername').value.trim();
             const password = loginForm.querySelector('#loginPassword').value;
             const errorDiv = loginRight.querySelector('#loginError');
+            errorDiv.textContent = '';
+            if (!username || !password) {
+                errorDiv.textContent = 'Preencha todos os campos.';
+                return;
+            }
             if (!autenticarUsuario) {
                 errorDiv.textContent = 'Sistema de login não carregado.';
                 return;
