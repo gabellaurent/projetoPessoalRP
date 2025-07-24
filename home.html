@@ -67,10 +67,13 @@
             margin-bottom: 14px;
         }
         .main-content {
-            margin-left: 170px;
-            margin-top: 56px;
-            height: calc(100vh - 56px);
+            position: absolute;
+            top: 56px;
+            left: 170px;
+            right: 0;
+            bottom: 0;
             background: #232b32;
+            overflow: hidden;
         }
         .profile-panel {
             position: absolute;
@@ -117,8 +120,8 @@
             <input type="text" placeholder="Pesquisar aqui..">
         </div>
         <div class="navbar-icons">
-            <span class="icon"><i class="fa-regular fa-bell"></i></span>
-            <span class="icon"><i class="fa-regular fa-user"></i></span>
+            <span class="icon" id="bellIcon"><i class="fa-regular fa-bell"></i></span>
+            <span class="icon" id="userIcon"><i class="fa-regular fa-user"></i></span>
         </div>
     </div>
     <div class="sidebar">
@@ -127,11 +130,49 @@
         <div class="sidebar-user">Usuário 30</div>
         <div class="sidebar-user">Usuário 49555</div>
     </div>
-    <div class="main-content"></div>
-    <div class="profile-panel">
+    <div class="main-content">
+        <div id="chat-root"></div>
+    </div>
+    <div class="notification-panel" id="notificationPanel" style="display:none; position:absolute; top:56px; right:0; width:220px; background:#2c3e50; padding:24px; box-sizing:border-box; color:#fff; min-height:80px; z-index:101; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+        <h2 style="font-size:1.1em; margin-bottom:10px;">Notificações</h2>
+        <div style="color:#b8c7d1;">Você não possui nenhuma notificação.</div>
+    </div>
+    <div class="profile-panel" id="profilePanel" style="display:none;">
         <h2>Bem vindo<br><em>Usuário 1</em></h2>
         <a href="#">Settings</a>
         <a href="#">Logout</a>
     </div>
 </body>
+    <script src="chat-embed.js"></script>
+    <script>
+    // Exibe/oculta o painel de perfil ao clicar no ícone de usuário
+    const userIcon = document.getElementById('userIcon');
+    const profilePanel = document.getElementById('profilePanel');
+    const bellIcon = document.getElementById('bellIcon');
+    const notificationPanel = document.getElementById('notificationPanel');
+
+    userIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        // Fecha painel de notificações se aberto
+        notificationPanel.style.display = 'none';
+        profilePanel.style.display = profilePanel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    bellIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        // Fecha painel de perfil se aberto
+        profilePanel.style.display = 'none';
+        notificationPanel.style.display = notificationPanel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Oculta ambos os painéis se clicar fora deles
+    document.addEventListener('click', function(e) {
+        if (profilePanel.style.display === 'block' && !profilePanel.contains(e.target) && e.target !== userIcon && !userIcon.contains(e.target)) {
+            profilePanel.style.display = 'none';
+        }
+        if (notificationPanel.style.display === 'block' && !notificationPanel.contains(e.target) && e.target !== bellIcon && !bellIcon.contains(e.target)) {
+            notificationPanel.style.display = 'none';
+        }
+    });
+    </script>
 </html>
