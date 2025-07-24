@@ -194,7 +194,7 @@
         sidebarUsers.innerHTML = 'Carregando...';
         const { data, error } = await supabase
             .from('base-users')
-            .select('username');
+            .select('username, lastActive');
         if (error) {
             sidebarUsers.innerHTML = '<div style="color:#e74c3c;">Erro ao carregar usuários.</div>';
             console.error('Erro ao buscar usuários:', error.message);
@@ -205,13 +205,82 @@
             return;
         }
         sidebarUsers.innerHTML = '';
-        data.forEach(user => {
+        // Separar online e offline com base no lastActive
+        const now = Date.now();
+        const onlineUsers = data.filter(u => {
+            if (!u.lastActive) return false;
+            const lastActive = new Date(u.lastActive).getTime();
+            return (now - lastActive) < 70000; // 70 segundos
+        });
+        const offlineUsers = data.filter(u => {
+            if (!u.lastActive) return true;
+            const lastActive = new Date(u.lastActive).getTime();
+            return (now - lastActive) >= 70000;
+        });
+        // Exibir online primeiro
+        onlineUsers.forEach(user => {
             const div = document.createElement('div');
             div.className = 'sidebar-user';
             div.textContent = user.username;
+            div.style.color = '#fff';
+            sidebarUsers.appendChild(div);
+        });
+        offlineUsers.forEach(user => {
+            const div = document.createElement('div');
+            div.className = 'sidebar-user';
+            div.textContent = user.username;
+            div.style.color = '#b8c7d1';
             sidebarUsers.appendChild(div);
         });
     }
     listarUsuariosSidebar();
+
+    // Atualização em tempo real dos usuários registrados
+    supabase
+      .channel('public:base-users')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'base-users' }, payload => {
+        listarUsuariosSidebar();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'base-users' }, payload => {
+        listarUsuariosSidebar();
+      })
+      .subscribe();
+
+    // Heartbeat: atualiza lastActive a cada 60s
+    setInterval(async () => {
+        const username = localStorage.getItem('username');
+        if (username) {
+            // Busca o id do usuário
+            const { data } = await supabase
+                .from('base-users')
+                .select('id')
+                .eq('username', username)
+                .single();
+            if (data && data.id) {
+                await supabase
+                    .from('base-users')
+                    .update({ lastActive: new Date().toISOString() })
+                    .eq('id', data.id);
+            }
+        }
+    }, 60000);
+
+    // Atualiza lastActive ao carregar a página (indica que o usuário entrou)
+    (async () => {
+        const username = localStorage.getItem('username');
+        if (username) {
+            const { data } = await supabase
+                .from('base-users')
+                .select('id')
+                .eq('username', username)
+                .single();
+            if (data && data.id) {
+                await supabase
+                    .from('base-users')
+                    .update({ lastActive: new Date().toISOString() })
+                    .eq('id', data.id);
+            }
+        }
+    })();
     </script>
 </html>

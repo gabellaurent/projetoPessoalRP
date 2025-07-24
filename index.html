@@ -201,6 +201,11 @@
       if (error || !data) {
         errorMsg.textContent = "Usuário ou senha incorretos.";
       } else {
+        // Atualiza status para online
+        await supabase
+          .from("base-users")
+          .update({ isOnline: true })
+          .eq("id", data.id);
         localStorage.setItem("username", username);
         window.location.href = "https://gabellaurent.github.io/projetoPessoalRP/home.html";
       }
