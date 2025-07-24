@@ -125,10 +125,8 @@
         </div>
     </div>
     <div class="sidebar">
-        <div class="sidebar-user">Usuário 2200</div>
-        <div class="sidebar-user">Usuário 2200</div>
-        <div class="sidebar-user">Usuário 30</div>
-        <div class="sidebar-user">Usuário 49555</div>
+        <h2 style="font-size:1.1em; color:#b8c7d1; margin-bottom:18px;">Usuários</h2>
+        <div id="sidebar-users">Carregando...</div>
     </div>
     <div class="main-content">
         <div id="chat-root"></div>
@@ -144,7 +142,7 @@
     </div>
 </body>
     <script src="chat-embed.js"></script>
-    <script>
+    <script type="module">
     // Exibe/oculta o painel de perfil ao clicar no ícone de usuário
     const userIcon = document.getElementById('userIcon');
     const profilePanel = document.getElementById('profilePanel');
@@ -174,5 +172,36 @@
             notificationPanel.style.display = 'none';
         }
     });
+
+    // SUPABASE: Listar usuários na sidebar
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    async function listarUsuariosSidebar() {
+        const sidebarUsers = document.getElementById('sidebar-users');
+        sidebarUsers.innerHTML = 'Carregando...';
+        const { data, error } = await supabase
+            .from('base-users')
+            .select('username');
+        if (error) {
+            sidebarUsers.innerHTML = '<div style="color:#e74c3c;">Erro ao carregar usuários.</div>';
+            console.error('Erro ao buscar usuários:', error.message);
+            return;
+        }
+        if (!data || data.length === 0) {
+            sidebarUsers.innerHTML = '<div style="color:#b8c7d1;">Nenhum usuário encontrado.</div>';
+            return;
+        }
+        sidebarUsers.innerHTML = '';
+        data.forEach(user => {
+            const div = document.createElement('div');
+            div.className = 'sidebar-user';
+            div.textContent = user.username;
+            sidebarUsers.appendChild(div);
+        });
+    }
+    listarUsuariosSidebar();
     </script>
 </html>

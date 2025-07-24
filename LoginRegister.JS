@@ -1,6 +1,11 @@
 // LoginRegister.JS
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Importação dinâmica do módulo de login
+    let autenticarUsuario;
+    import('./login-supabase.js').then(mod => {
+        autenticarUsuario = mod.autenticarUsuario;
+    });
     const loginBox = document.querySelector('.login-box');
     const loginRight = document.querySelector('.login-right');
     const registerLink = document.querySelector('.register-link a');
@@ -25,15 +30,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function createLoginForm() {
         return `
             <div class="login-title">Login</div>
-            <form class="login-form">
-                <input type="text" placeholder="User ID" required>
-                <input type="password" placeholder="Password" required>
+            <form class="login-form" id="loginForm">
+                <input type="text" id="loginUsername" placeholder="User ID" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
                 <button type="submit">Login</button>
             </form>
             <div class="register-link">
                 Don’t have an account?
                 <a href="#register">Register</a>
             </div>
+            <div id="loginError" style="color:#e74c3c;margin-top:10px;"></div>
         `;
     }
 
@@ -47,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e) e.preventDefault();
         loginRight.innerHTML = createLoginForm();
         attachRegisterLink();
+        attachLoginSubmit();
     }
 
     function attachRegisterLink() {
@@ -63,6 +70,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Inicializa o evento do link Register
+    // Inicializa o evento do link Register e submit do login
     attachRegisterLink();
+    attachLoginSubmit();
+
+    function attachLoginSubmit() {
+        const loginForm = loginRight.querySelector('#loginForm');
+        if (!loginForm) return;
+        loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const username = loginForm.querySelector('#loginUsername').value.trim();
+            const password = loginForm.querySelector('#loginPassword').value;
+            const errorDiv = loginRight.querySelector('#loginError');
+            if (!autenticarUsuario) {
+                errorDiv.textContent = 'Sistema de login não carregado.';
+                return;
+            }
+            const result = await autenticarUsuario(username, password);
+            if (result.sucesso) {
+                window.location.href = 'home.html';
+            } else {
+                errorDiv.textContent = result.mensagem;
+            }
+        });
+    }
 });
