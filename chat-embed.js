@@ -15,21 +15,21 @@
     #chat-root { width: 100%; height: 100%; }
     .chat-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
     .container { background: #36393f; padding: 0; border-radius: 12px; width: 100%; height: 100%; box-shadow: 0 2px 24px 0 rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; }
-    h1 { color: #fff; font-size: 1.4rem; font-weight: 600; background: #23272a; margin: 0; padding: 18px 0 12px 0; border-radius: 12px 12px 0 0; letter-spacing: 1px; width: 100%; box-sizing: border-box; text-align: center; }
+    h1 { color: #fff; font-size: 1.4rem; font-weight: 600; background: #10151a; margin: 0; padding: 18px 0 12px 0; border-radius: 12px 12px 0 0; letter-spacing: 1px; width: 100%; box-sizing: border-box; text-align: center; border-bottom: 3px solid #7fa7d6; }
     .user-box { background: #23272a; padding: 10px 16px 8px 16px; border-bottom: 1px solid #222; width: 100%; box-sizing: border-box; }
     #usuario { width: 100%; padding: 8px 10px; border-radius: 6px; border: none; background: #40444b; color: #fff; font-size: 1rem; outline: none; box-sizing: border-box; }
-    .chat-box { flex: 1 1 0; min-height: 0; overflow-y: auto; background: #23272a; padding: 18px 10px 10px 10px; margin-bottom: 0 !important; }
+    .chat-box { flex: 1 1 0; min-height: 0; overflow-y: auto; background: #10151a; padding: 18px 10px 10px 10px; margin-bottom: 0 !important; }
     .chat-list { list-style: none; padding: 0; margin: 0; }
     .chat-msg { color: #dcddde; margin-bottom: 12px; padding: 10px 14px 8px 14px; border-radius: 8px; text-align: left; position: relative; word-break: break-word; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.08); transition: background 0.2s; }
     .chat-msg:last-child { margin-bottom: 0; }
     .chat-msg .user { color: #00b0f4; font-weight: 600; margin-right: 8px; font-size: 1rem; }
     .chat-msg .hora { color: #72767d; font-size: 0.85rem; float: right; }
     .chat-msg .texto { display: block; margin-top: 2px; font-size: 1.05rem; color: #dcddde; }
-    .input-box { display: flex; align-items: flex-end; background: #23272a; padding: 14px 12px 14px 12px; border-radius: 0 0 12px 12px; gap: 8px; }
+    .input-box { display: flex; align-items: flex-end; background: #10151a; padding: 14px 12px 14px 12px; border-radius: 0 0 12px 12px; gap: 8px; }
     #mensagem { flex: 1; min-height: 38px; max-height: 80px; resize: none; border-radius: 6px; border: none; background: #40444b; color: #fff; font-size: 1rem; padding: 8px 10px; outline: none; margin-right: 4px; }
     #enviar { background: #5865f2; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
     #enviar:hover { background: #4752c4; }
-    ::-webkit-scrollbar { width: 8px; background: #23272a; }
+    ::-webkit-scrollbar { width: 8px; background: #10151a; }
     ::-webkit-scrollbar-thumb { background: #40444b; border-radius: 4px; }
     .erro-usuario { border: 2px solid #ff5555 !important; box-shadow: 0 0 0 2px #ff555588; background: #3a2323 !important; color: #fff !important; }
     .erro-usuario::placeholder { color: #ff5555 !important; opacity: 1; }

@@ -1,13 +1,13 @@
 body {
     margin: 0;
     font-family: 'Montserrat', Arial, sans-serif;
-    background: #232b32;
+    background: linear-gradient(135deg, #7fa7d6 0%, #3b5998 100%);
     color: #fff;
 }
 .navbar {
     display: flex;
     align-items: center;
-    background: #1a232b;
+    background: #23272f;
     padding: 0 0 0 20px;
     height: 56px;
     position: relative;
@@ -28,8 +28,8 @@ body {
     padding: 8px 16px;
     border-radius: 20px;
     border: none;
-    background: #b8c7d1;
-    color: #232b32;
+    background: #7fa7d6;
+    color: #23395d;
     font-size: 1rem;
     outline: none;
 }
@@ -50,7 +50,7 @@ body {
     left: 0;
     width: 170px;
     height: calc(100vh - 56px);
-    background: #2c3e50;
+    background: #23272f;
     padding: 24px 0 0 16px;
     box-sizing: border-box;
 }
@@ -66,7 +66,7 @@ body {
     left: 170px;
     right: 0;
     bottom: 0;
-    background: #232b32;
+    background: rgb(35 39 47);
     overflow: hidden;
 }
 .profile-panel {
@@ -74,7 +74,7 @@ body {
     top: 56px;
     right: 0;
     width: 220px;
-    background: #2c3e50;
+    background: #23395d;
     padding: 24px 24px 24px 24px;
     box-sizing: border-box;
     color: #fff;
@@ -88,7 +88,7 @@ body {
 .profile-panel em {
     font-style: italic;
     font-weight: 700;
-    color: #b8c7d1;
+    color: #7fa7d6;
 }
 .profile-panel a {
     display: block;
