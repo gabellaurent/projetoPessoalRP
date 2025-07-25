@@ -1,215 +1,357 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Login de Teste</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Montserrat', Arial, sans-serif;
-      background: linear-gradient(135deg, #7fa7d6 0%, #3b5998 100%);
-      min-height: 100vh;
-    }
-    .navbar {
-      position: absolute;
-      top: 32px;
-      right: 64px;
-      display: flex;
-      gap: 24px;
-      font-size: 1.3rem;
-      z-index: 2;
-    }
-    .navbar a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 6px;
-      transition: background 0.2s;
-    }
-    .navbar a:last-child {
-      border: 2px solid #fff;
-      background: rgba(255,255,255,0.08);
-    }
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .card {
-      display: flex;
-      width: 700px;
-      height: 450px;
-      background: none;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    }
-    .card-left {
-      flex: 1;
-      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80') center/cover no-repeat;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 2.2rem;
-      font-weight: 700;
-      text-align: center;
-      padding: 0 24px;
-      letter-spacing: 1px;
-      line-height: 1.2;
-      text-shadow: 0 2px 8px #000a;
-    }
-    .card-right {
-      flex: 1;
-      background: #23395d;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 0 32px;
-    }
-    .login-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-    #login-form {
-      width: 100%;
-      max-width: 320px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    #login-form input {
-      background: #1a2942;
-      border: 1.5px solid #3b5998;
-      color: #fff;
-      font-size: 1.1rem;
-      border-radius: 6px;
-      padding: 10px 16px;
-      outline: none;
-      margin: 0;
-      font-family: inherit;
-    }
-    #login-form button {
-      background: #14243a;
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 0;
-      margin-top: 8px;
-      cursor: pointer;
-      box-shadow: 0 2px 8px #0002;
-      transition: background 0.2s;
-    }
-    #login-form button:hover {
-      background: #23395d;
-    }
-    .error {
-      color: #e74c3c;
-      margin-top: 8px;
-      font-size: 1rem;
-      text-align: center;
-    }
-    .register-link {
-      margin-top: 18px;
-      font-size: 0.98rem;
-      color: #fff;
-      text-align: center;
-    }
-    .register-link a {
-      color: #7fa7d6;
-      text-decoration: underline;
-      font-weight: 600;
-      margin-left: 4px;
-    }
-    @media (max-width: 800px) {
-      .container { height: auto; }
-      .card { flex-direction: column; width: 98vw; height: auto; min-height: 500px; }
-      .card-left, .card-right { min-height: 220px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=800, initial-scale=1.0">
+    <title>Login e Registro SPA</title>
+    <style>
+        body {
+            background: #18181b;
+            font-family: 'Inter', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .navbar {
+            width: 100vw;
+            height: 56px;
+            background: #23272f;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            box-shadow: 0 2px 8px 0 #0002;
+        }
+        .navbar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .navbar-toggle {
+            display: flex;
+            gap: 8px;
+        }
+        .navbar-toggle button {
+            background: none;
+            border: none;
+            color: #f1f5f9;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .navbar-toggle button.active {
+            background: #6366f1;
+            color: #fff;
+        }
+        .center-content {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spa-form {
+            width: 320px;
+            background: #23272f;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px 0 #0003;
+            padding: 32px 28px 24px 28px;
+            display: none;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .spa-form.active {
+            display: flex;
+        }
+        .spa-form-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+        .spa-form input {
+            padding: 12px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #f3f4f6;
+            font-size: 1rem;
+            color: #23272f;
+            outline: none;
+            transition: box-shadow 0.2s, background 0.2s;
+        }
+        .spa-form input:focus {
+            box-shadow: 0 0 0 2px #6366f1;
+            background: #fff;
+        }
+        .spa-form button[type="submit"] {
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+        }
+        .spa-form button[type="submit"]:hover {
+            background: #4f46e5;
+        }
+        .spa-message {
+            text-align: center;
+            color: #22c55e;
+            font-size: 1rem;
+        }
+        .spa-error {
+            text-align: center;
+            color: #ef4444;
+            font-size: 1rem;
+        }
+        @media (max-width: 600px) {
+            .spa-form {
+                width: 98vw;
+                padding: 18px 4vw 18px 4vw;
+            }
+            .navbar {
+                padding: 0 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="navbar">
-    <a href="#">About</a>
-    <a href="#">Discord</a>
-    <a href="#" style="border:2px solid #fff;">Login</a>
-  </div>
-  <div class="container">
-    <div class="card">
-      <div class="card-left">
-        <span>
-          Bem-vindo,<br>
-          Faça o Login,<br>
-          e Divirta-se.<br>
-          Começe agora.
-        </span>
-      </div>
-      <div class="card-right">
-        <div class="login-title">Login</div>
-        <form id="login-form">
-          <input type="text" id="username" placeholder="User ID" required>
-          <input type="password" id="password" placeholder="Password" required>
-          <button type="submit">Login</button>
-          <div class="error" id="error-msg"></div>
-        </form>
-        <div class="register-link">
-          Don't have an account? <a href="https://gabellaurent.github.io/projetoPessoalRP/register.html">Register</a>
+    <canvas id="bg-canvas"></canvas>
+    <div class="navbar">
+        <div class="navbar-title">MinhaApp</div>
+        <div class="navbar-toggle">
+            <button id="btn-login" class="active">Login</button>
+            <button id="btn-register">Registrar</button>
         </div>
-      </div>
     </div>
-  </div>
+    <div class="center-content" style="position: relative; z-index: 1;">
+        <form id="login-form" class="spa-form active" autocomplete="off">
+            <div class="spa-form-title">Login</div>
+            <input type="text" id="login-username" placeholder="Insira seu email" required>
+            <input type="password" id="login-password" placeholder="Digite sua senha" required>
+            <button type="submit">Entrar</button>
+            <div id="login-message" class="spa-message" style="display:none;"></div>
+            <div id="login-error" class="spa-error" style="display:none;"></div>
+        </form>
+        <form id="register-form" class="spa-form" autocomplete="off">
+            <div class="spa-form-title">Registrar</div>
+            <input type="text" id="register-username" placeholder="Usuário" required>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Senha" required>
+            <input type="password" id="register-password2" placeholder="Repita a senha" required>
+            <button type="submit">Registrar</button>
+            <div id="register-message" class="spa-message" style="display:none;"></div>
+            <div id="register-error" class="spa-error" style="display:none;"></div>
+        </form>
+    </div>
+    <script type="module">
+        // Importar supabase-js via CDN
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        // Animação de textos passando no fundo
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let W = window.innerWidth;
+        let H = window.innerHeight;
+        function resizeCanvas() {
+            W = window.innerWidth;
+            H = window.innerHeight;
+            canvas.width = W;
+            canvas.height = H;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+        // Textos para animar
+        const texts = [
+            'Bem-vindo', 'Login', 'Registro', 'SPA', 'Minimal', 'JavaScript', 'Segurança', 'Usuário', 'Senha', 'Email', 'Acesse', 'Crie sua conta', 'Fácil', 'Rápido', 'Seguro'
+        ];
+        function randomText() {
+            return texts[Math.floor(Math.random() * texts.length)];
+        }
 
-    const supabase = createClient(
-      'https://xhybbhdhjaluqjrtopml.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck'
-    );
+        // Cada texto animado
+        class AnimatedText {
+            constructor(initialX = null) {
+                this.reset(initialX);
+            }
+            reset(initialX = null) {
+                this.text = randomText();
+                // Se initialX for fornecido, use, senão comece fora da tela
+                if (initialX !== null) {
+                    this.x = initialX;
+                } else {
+                    this.x = -Math.random() * W;
+                }
+                this.y = Math.random() * (H - 40) + 20;
+                this.speed = 0.5 + Math.random() * 1.2;
+                this.size = 18 + Math.random() * 18;
+                this.alpha = 0.08 + Math.random() * 0.10;
+            }
+            update() {
+                this.x += this.speed;
+                if (this.x > W + 100) this.reset();
+            }
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.font = `bold ${this.size}px Inter, Arial, sans-serif`;
+                ctx.fillStyle = '#fff';
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+        // Criar vários textos animados já distribuídos pela tela
+        const animatedTexts = [];
+        const N = 38;
+        for (let i = 0; i < N; i++) {
+            // Distribuir espaçadamente pela largura da tela
+            let initialX = (i + 0.5) * (W / N) + (Math.random() - 0.5) * (W / N / 2);
+            animatedTexts.push(new AnimatedText(initialX));
+        }
 
-    const form = document.getElementById("login-form");
-    const errorMsg = document.getElementById("error-msg");
+        function animate() {
+            ctx.clearRect(0, 0, W, H);
+            for (const t of animatedTexts) {
+                t.update();
+                t.draw(ctx);
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+        // SPA toggle logic
+        const btnLogin = document.getElementById('btn-login');
+        const btnRegister = document.getElementById('btn-register');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      errorMsg.textContent = "";
+        btnLogin.addEventListener('click', () => {
+            btnLogin.classList.add('active');
+            btnRegister.classList.remove('active');
+            loginForm.classList.add('active');
+            registerForm.classList.remove('active');
+        });
+        btnRegister.addEventListener('click', () => {
+            btnRegister.classList.add('active');
+            btnLogin.classList.remove('active');
+            registerForm.classList.add('active');
+            loginForm.classList.remove('active');
+        });
 
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value;
+        // Simulação de "banco de dados" local
+        const users = JSON.parse(localStorage.getItem('spa-users') || '[]');
 
-      if (!password) {
-        window.location.href = "https://gabellaurent.github.io/projetoPessoalRP/register.html";
-        return;
-      }
+        // Registro com Supabase Auth
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const password2 = document.getElementById('register-password2').value;
+            const msg = document.getElementById('register-message');
+            const err = document.getElementById('register-error');
+            msg.style.display = 'none';
+            err.style.display = 'none';
 
-      const { data, error } = await supabase
-        .from("base-users")
-        .select("id")
-        .eq("username", username)
-        .eq("password", password)
-        .single();
+            if (password !== password2) {
+                err.textContent = 'As senhas não coincidem.';
+                err.style.display = 'block';
+                return;
+            }
+            // Tenta criar usuário no Supabase Auth
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { username }
+                }
+            });
+            if (error) {
+                err.textContent = error.message || 'Erro ao registrar usuário.';
+                err.style.display = 'block';
+                return;
+            }
 
-      if (error || !data) {
-        errorMsg.textContent = "Usuário ou senha incorretos.";
-      } else {
-        // Atualiza status para online
-        await supabase
-          .from("base-users")
-          .update({ isOnline: true })
-          .eq("id", data.id);
-        localStorage.setItem("username", username);
-        window.location.href = "https://gabellaurent.github.io/projetoPessoalRP/home.html";
-      }
-    });
-  </script>
+            // Alimenta a tabela base-users
+            try {
+                // O id uuid do usuário criado no auth
+                const userId = data.user?.id;
+                if (userId) {
+                    const now = new Date().toISOString();
+                    const { error: insertError } = await supabase.from('base-users').insert([
+                        {
+                            id: userId,
+                            username,
+                            email,
+                            created_at: now,
+                            lastActive: now,
+                            isOnline: false
+                        }
+                    ]);
+                    if (insertError) {
+                        // Apenas loga o erro, não bloqueia o registro
+                        console.error('Erro ao inserir na base-users:', insertError.message);
+                    }
+                }
+            } catch (e) {
+                console.error('Erro inesperado ao inserir na base-users:', e);
+            }
+
+            msg.textContent = 'Registro realizado! Verifique seu email.';
+            msg.style.display = 'block';
+            registerForm.reset();
+        });
+
+        // Login com Supabase Auth (email e senha)
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const msg = document.getElementById('login-message');
+            const err = document.getElementById('login-error');
+            msg.style.display = 'none';
+            err.style.display = 'none';
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            if (error) {
+                err.textContent = error.message || 'Usuário ou senha inválidos.';
+                err.style.display = 'block';
+                return;
+            }
+            msg.textContent = 'Login realizado com sucesso!';
+            msg.style.display = 'block';
+            loginForm.reset();
+            setTimeout(() => {
+                window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP/home.html';
+            }, 1200);
+        });
+    </script>
 </body>
 </html>

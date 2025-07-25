@@ -1,17 +1,61 @@
 
-// Redireciona se username não existir ou for vazio
-const username = localStorage.getItem("username");
-if (!username || username.trim() === "") {
-    window.location.href = "https://gabellaurent.github.io/projetoPessoalRP";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+async function ensureUsername() {
+    let username = localStorage.getItem("username");
+    if (!username || username.trim() === "") {
+        // Tenta obter usuário autenticado
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && user.id) {
+            // Busca username na base-users
+            const { data, error } = await supabase
+                .from('base-users')
+                .select('username')
+                .eq('id', user.id)
+                .single();
+            if (data && data.username) {
+                localStorage.setItem('username', data.username);
+                // Recarrega para seguir o fluxo normal
+                window.location.reload();
+                return;
+            }
+        }
+        // Se não conseguir, redireciona para login
+        window.location.href = "https://gabellaurent.github.io/projetoPessoalRP";
+        return;
+    }
+    // Exibe o body após validação
+    document.body.style.display = '';
 }
+
+await ensureUsername();
 
 // Exibe/oculta o painel de perfil ao clicar no ícone de usuário
 const userIcon = document.getElementById('userIcon');
 const profilePanel = document.getElementById('profilePanel');
 const bellIcon = document.getElementById('bellIcon');
 const notificationPanel = document.getElementById('notificationPanel');
-// Exibe o nome do usuário logado
-document.getElementById("profile-username").textContent = username || "Usuário";
+
+// Busca o username diretamente da tabela base-users usando o id do usuário autenticado
+async function exibirNomeUsuarioProfile() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && user.id) {
+        const { data, error } = await supabase
+            .from('base-users')
+            .select('username')
+            .eq('id', user.id)
+            .single();
+        if (data && data.username) {
+            document.getElementById("profile-username").textContent = data.username;
+            return;
+        }
+    }
+    document.getElementById("profile-username").textContent = "Usuário";
+}
+exibirNomeUsuarioProfile();
 
 userIcon.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -41,14 +85,11 @@ document.addEventListener('click', function(e) {
 document.getElementById('logout-btn').addEventListener('click', function(e) {
     e.preventDefault();
     localStorage.removeItem('username');
-    window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP/index.html';
+    window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP';
 });
 
 // SUPABASE: Listar usuários na sidebar
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// ...já importado e criado acima...
 
 let lastSidebarState = '';
 async function listarUsuariosSidebar() {
