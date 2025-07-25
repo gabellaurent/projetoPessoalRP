@@ -24,7 +24,7 @@ async function ensureUsername() {
             }
         }
         // Se não conseguir, redireciona para login
-        window.location.href = "index.html";
+        window.location.href = "https://gabellaurent.github.io/projetoPessoalRP";
         return;
     }
     // Exibe o body após validação
@@ -85,7 +85,7 @@ document.addEventListener('click', function(e) {
 document.getElementById('logout-btn').addEventListener('click', function(e) {
     e.preventDefault();
     localStorage.removeItem('username');
-    window.location.href = 'index.html';
+    window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP';
 });
 
 // SUPABASE: Listar usuários na sidebar
