@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=800, initial-scale=1.0">
+    <title>Login e Registro SPA</title>
+    <style>
+        body {
+            background: #18181b;
+            font-family: 'Inter', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .navbar {
+            width: 100vw;
+            height: 56px;
+            background: #23272f;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            box-shadow: 0 2px 8px 0 #0002;
+        }
+        .navbar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .navbar-toggle {
+            display: flex;
+            gap: 8px;
+        }
+        .navbar-toggle button {
+            background: none;
+            border: none;
+            color: #f1f5f9;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 6px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .navbar-toggle button.active {
+            background: #6366f1;
+            color: #fff;
+        }
+        .center-content {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spa-form {
+            width: 320px;
+            background: #23272f;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px 0 #0003;
+            padding: 32px 28px 24px 28px;
+            display: none;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .spa-form.active {
+            display: flex;
+        }
+        .spa-form-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+        .spa-form input {
+            padding: 12px 14px;
+            border: none;
+            border-radius: 8px;
+            background: #f3f4f6;
+            font-size: 1rem;
+            color: #23272f;
+            outline: none;
+            transition: box-shadow 0.2s, background 0.2s;
+        }
+        .spa-form input:focus {
+            box-shadow: 0 0 0 2px #6366f1;
+            background: #fff;
+        }
+        .spa-form button[type="submit"] {
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
+        }
+        .spa-form button[type="submit"]:hover {
+            background: #4f46e5;
+        }
+        .spa-message {
+            text-align: center;
+            color: #22c55e;
+            font-size: 1rem;
+        }
+        .spa-error {
+            text-align: center;
+            color: #ef4444;
+            font-size: 1rem;
+        }
+        @media (max-width: 600px) {
+            .spa-form {
+                width: 98vw;
+                padding: 18px 4vw 18px 4vw;
+            }
+            .navbar {
+                padding: 0 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-title">MinhaApp</div>
+        <div class="navbar-toggle">
+            <button id="btn-login" class="active">Login</button>
+            <button id="btn-register">Registrar</button>
+        </div>
+    </div>
+    <div class="center-content">
+        <form id="login-form" class="spa-form active" autocomplete="off">
+            <div class="spa-form-title">Login</div>
+            <input type="text" id="login-username" placeholder="Usuário" required>
+            <input type="password" id="login-password" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+            <div id="login-message" class="spa-message" style="display:none;"></div>
+            <div id="login-error" class="spa-error" style="display:none;"></div>
+        </form>
+        <form id="register-form" class="spa-form" autocomplete="off">
+            <div class="spa-form-title">Registrar</div>
+            <input type="text" id="register-username" placeholder="Usuário" required>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Senha" required>
+            <input type="password" id="register-password2" placeholder="Repita a senha" required>
+            <button type="submit">Registrar</button>
+            <div id="register-message" class="spa-message" style="display:none;"></div>
+            <div id="register-error" class="spa-error" style="display:none;"></div>
+        </form>
+    </div>
+    <script>
+        // SPA toggle logic
+        const btnLogin = document.getElementById('btn-login');
+        const btnRegister = document.getElementById('btn-register');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        btnLogin.addEventListener('click', () => {
+            btnLogin.classList.add('active');
+            btnRegister.classList.remove('active');
+            loginForm.classList.add('active');
+            registerForm.classList.remove('active');
+        });
+        btnRegister.addEventListener('click', () => {
+            btnRegister.classList.add('active');
+            btnLogin.classList.remove('active');
+            registerForm.classList.add('active');
+            loginForm.classList.remove('active');
+        });
+
+        // Simulação de "banco de dados" local
+        const users = JSON.parse(localStorage.getItem('spa-users') || '[]');
+
+        // Registro
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const password2 = document.getElementById('register-password2').value;
+            const msg = document.getElementById('register-message');
+            const err = document.getElementById('register-error');
+            msg.style.display = 'none';
+            err.style.display = 'none';
+
+            if (password !== password2) {
+                err.textContent = 'As senhas não coincidem.';
+                err.style.display = 'block';
+                return;
+            }
+            if (users.find(u => u.username === username)) {
+                err.textContent = 'Usuário já existe.';
+                err.style.display = 'block';
+                return;
+            }
+            users.push({ username, email, password });
+            localStorage.setItem('spa-users', JSON.stringify(users));
+            msg.textContent = 'Registro realizado com sucesso!';
+            msg.style.display = 'block';
+            registerForm.reset();
+        });
+
+        // Login
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const msg = document.getElementById('login-message');
+            const err = document.getElementById('login-error');
+            msg.style.display = 'none';
+            err.style.display = 'none';
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                msg.textContent = 'Login realizado com sucesso!';
+                msg.style.display = 'block';
+                loginForm.reset();
+            } else {
+                err.textContent = 'Usuário ou senha inválidos.';
+                err.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
