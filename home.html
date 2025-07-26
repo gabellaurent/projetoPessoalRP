@@ -15,6 +15,7 @@
         </div>
         <div class="navbar-icons">
             <span class="icon" id="bellIcon"><i class="fa-regular fa-bell"></i></span>
+            <span class="icon" id="chatIcon" title="Abrir Chat"><i class="fa-regular fa-comment"></i></span>
             <span class="icon" id="userIcon"><i class="fa-regular fa-user"></i></span>
         </div>
     </div>
@@ -36,5 +37,24 @@
     </div>
     <script src="chat-embed.js"></script>
     <script type="module" src="home.js"></script>
+    <script>
+    // Reabrir o chat ao clicar no ícone de chat
+    document.addEventListener('DOMContentLoaded', function() {
+      var chatIcon = document.getElementById('chatIcon');
+      chatIcon.addEventListener('click', function() {
+        var chatRoot = document.getElementById('chat-root');
+        // Se o chat não estiver aberto, recarrega o chat-embed.js
+        if (!chatRoot || chatRoot.innerHTML.trim() === '') {
+          // Remove o script antigo se existir
+          var oldScript = document.querySelector('script[src="chat-embed.js"]');
+          if (oldScript) oldScript.remove();
+          // Cria novo script
+          var script = document.createElement('script');
+          script.src = 'chat-embed.js';
+          document.body.appendChild(script);
+        }
+      });
+    });
+    </script>
 </body>
 </html>
