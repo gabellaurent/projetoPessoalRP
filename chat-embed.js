@@ -15,7 +15,7 @@
     #chat-root { width: 100%; height: 100%; }
     .chat-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
     .container { background: #36393f; padding: 0; border-radius: 12px; width: 100%; height: 100%; box-shadow: 0 2px 24px 0 rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; }
-    h1 { color: #fff; font-size: 1.4rem; font-weight: 600; background: #10151a; margin: 0; padding: 18px 0 12px 0; border-radius: 12px 12px 0 0; letter-spacing: 1px; width: 100%; box-sizing: border-box; text-align: center; border-bottom: 3px solid #7fa7d6; }
+    h1 { color: #fff; font-size: 1.4rem; font-weight: 600; background: #10151a; margin: 0; padding: 18px 0 12px 0; border-radius: 12px 12px 0 0; letter-spacing: 1px; width: 100%; box-sizing: border-box; text-align: center; border-bottom: 1px solid #2d3b49; }
     .user-box { background: #23272a; padding: 10px 16px 8px 16px; border-bottom: 1px solid #222; width: 100%; box-sizing: border-box; }
     #usuario { width: 100%; padding: 8px 10px; border-radius: 6px; border: none; background: #40444b; color: #fff; font-size: 1rem; outline: none; box-sizing: border-box; }
     .chat-box { flex: 1 1 0; min-height: 0; overflow-y: auto; background: #10151a; padding: 18px 10px 10px 10px; margin-bottom: 0 !important; }
