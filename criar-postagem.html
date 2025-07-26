@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Postagem</title>
+  <style>
+    body { background: #222; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+    .form-container { max-width: 420px; margin: 48px auto; background: #2d2d2d; border-radius: 12px; box-shadow: 0 2px 16px #0005; padding: 32px 28px; color: #fff; }
+    h2 { text-align: center; margin-bottom: 24px; font-size: 1.3rem; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #00b0f4; }
+    input, textarea { width: 100%; padding: 10px; border-radius: 6px; border: none; background: #40444b; color: #fff; font-size: 1rem; margin-bottom: 18px; box-sizing: border-box; }
+    textarea { min-height: 80px; resize: vertical; }
+    button { background: #5865f2; color: #fff; border: none; border-radius: 6px; padding: 12px 0; font-size: 1.1rem; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; }
+    button:hover { background: #4752c4; }
+    .msg { text-align: center; margin-top: 18px; font-size: 1.05rem; }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Criar Nova Postagem</h2>
+    <form id="postForm">
+      <!-- Usuário será preenchido automaticamente pelo sistema -->
+      <label for="titulo">Título</label>
+      <input type="text" id="titulo" name="titulo" maxlength="80" required>
+      <label for="conteudo">Conteúdo</label>
+      <textarea id="conteudo" name="conteudo" maxlength="1000" required></textarea>
+      <button type="submit">Publicar</button>
+    </form>
+    <div class="msg" id="msg"></div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const form = document.getElementById('postForm');
+    const msg = document.getElementById('msg');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      msg.textContent = '';
+      const titulo = form.titulo.value.trim();
+      const conteudo = form.conteudo.value.trim();
+      if (!titulo || !conteudo) {
+        msg.textContent = 'Preencha todos os campos.';
+        msg.style.color = '#e74c3c';
+        return;
+      }
+      // Busca usuário logado
+      const { data: { user } } = await supabase.auth.getUser();
+      let usuario = 'anon_user';
+      if (user && user.id) {
+        // Busca username na base-users
+        const { data, error } = await supabase
+          .from('base-users')
+          .select('username')
+          .eq('id', user.id)
+          .single();
+        if (data && data.username) {
+          usuario = data.username;
+        }
+      }
+      const { error } = await supabase.from('posts').insert([
+        { usuario, titulo, conteudo }
+      ]);
+      if (error) {
+        msg.textContent = 'Erro ao publicar: ' + error.message;
+        msg.style.color = '#e74c3c';
+      } else {
+        msg.textContent = 'Postagem publicada com sucesso!';
+        msg.style.color = '#2ecc40';
+        form.reset();
+      }
+    });
+  </script>
+</body>
+</html>

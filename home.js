@@ -202,4 +202,16 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     // Atualiza a sidebar imediatamente após o heartbeat inicial
     listarUsuariosSidebar();
+
+    // Chama main-content.js para renderizar as postagens na div .main-content
+    if (!window.renderMainContent) {
+        const script = document.createElement('script');
+        script.src = 'main-content.js';
+        script.onload = function() {
+            window.renderMainContent('.main-content');
+        };
+        document.body.appendChild(script);
+    } else {
+        window.renderMainContent('.main-content');
+    }
 });

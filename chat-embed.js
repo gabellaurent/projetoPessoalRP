@@ -12,9 +12,9 @@
   // CSS do chat
   var css = `
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #313338; margin: 0; padding: 0; }
-    #chat-root { width: 100%; height: 100%; }
-    .chat-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-    .container { background: #36393f; padding: 0; border-radius: 12px; width: 100%; height: 100%; box-shadow: 0 2px 24px 0 rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; }
+    #chat-root { position:fixed; bottom:0; right:0; width:420px; height:800px; z-index:9999; }
+    .chat-wrapper { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+    .container { background:#36393f; padding:0; border-radius:12px; width:100%; height:100%; box-shadow:0 2px 24px 0 rgba(0,0,0,0.25); display:flex; flex-direction:column; overflow:hidden; }
     h1 { color: #fff; font-size: 1.4rem; font-weight: 600; background: #10151a; margin: 0; padding: 18px 0 12px 0; border-radius: 12px 12px 0 0; letter-spacing: 1px; width: 100%; box-sizing: border-box; text-align: center; border-bottom: 1px solid #2d3b49; }
     .user-box { background: #23272a; padding: 10px 16px 8px 16px; border-bottom: 1px solid #222; width: 100%; box-sizing: border-box; }
     #usuario { width: 100%; padding: 8px 10px; border-radius: 6px; border: none; background: #40444b; color: #fff; font-size: 1rem; outline: none; box-sizing: border-box; }
@@ -76,20 +76,22 @@
     document.head.appendChild(style);
 
     // Permite renderizar dentro de uma div com id="chat-root", se existir
-    var root = document.getElementById('chat-root') || document.body;
-    if (root === document.body) document.body.innerHTML = '';
+    var root = document.getElementById('chat-root');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'chat-root';
+      document.body.appendChild(root);
+    }
+    root.innerHTML = '';
     var wrapper = document.createElement('div');
     wrapper.className = 'chat-wrapper';
-    // Botão de fechar chat
-    var closeBtn = document.createElement('button');
-    closeBtn.textContent = 'Fechar Chat';
-    closeBtn.style.cssText = 'position:absolute;top:18px;right:18px;padding:7px 16px;border-radius:8px;background:#40444b;color:#fff;border:none;cursor:pointer;font-weight:600;box-shadow:0 2px 8px #0002;';
-    closeBtn.onclick = function() {
-      if (root) root.innerHTML = '';
-    };
+    // Nova aba de título com botão 'x'
     wrapper.innerHTML = `
       <div class="container" style="position:relative;">
-        <h1>Chat em Tempo Real</h1>
+        <div class="chat-tab" style="position:relative;display:flex;align-items:center;justify-content:center;background:#10151a;border-radius:12px 12px 0 0;border-bottom:1px solid #2d3b49;padding:0;">
+          <h1 style="color:#fff;font-size:1.4rem;font-weight:600;letter-spacing:1px;margin:0;padding:18px 0 12px 0;width:100%;text-align:center;">World Chat</h1>
+          <button id="close-chat" style="position:absolute;top:8px;right:16px;background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0 8px;line-height:1;font-weight:bold;">&times;</button>
+        </div>
         <!-- Campo de identificação removido, usuário será pego do localStorage -->
         <div class="chat-box">
           <ul id="chat" class="chat-list"></ul>
@@ -100,8 +102,14 @@
         </div>
       </div>
     `;
-    wrapper.querySelector('.container').appendChild(closeBtn);
     root.appendChild(wrapper);
+    // Botão 'x' para fechar
+    var closeBtn = wrapper.querySelector('#close-chat');
+    if (closeBtn) {
+      closeBtn.onclick = function() {
+        if (root) root.innerHTML = '';
+      };
+    }
 
     // Supabase config
     const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
