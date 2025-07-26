@@ -1,3 +1,6 @@
+/* Oculta barra de rolagem da main-content (cross-browser) */
+.main-content::-webkit-scrollbar { display: none; }
+.main-content { scrollbar-width: none; -ms-overflow-style: none; }
 body {
     margin: 0;
     font-family: 'Montserrat', Arial, sans-serif;
