@@ -83,7 +83,7 @@
     // Botão de fechar chat
     var closeBtn = document.createElement('button');
     closeBtn.textContent = 'Fechar Chat';
-    closeBtn.style.cssText = 'position:absolute;top:18px;right:18px;z-index:20;padding:7px 16px;border-radius:8px;background:#ef4444;color:#fff;border:none;cursor:pointer;font-weight:600;box-shadow:0 2px 8px #0002;';
+    closeBtn.style.cssText = 'position:absolute;top:18px;right:18px;padding:7px 16px;border-radius:8px;background:#40444b;color:#fff;border:none;cursor:pointer;font-weight:600;box-shadow:0 2px 8px #0002;';
     closeBtn.onclick = function() {
       if (root) root.innerHTML = '';
     };
@@ -120,7 +120,18 @@
       li.dataset.id = msg.id;
       const data = new Date(msg.created_at);
       const hora = data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      li.innerHTML = `<span class="user">${msg.usuario || 'Anônimo'}</span> <span class="hora">${hora}</span><br><span class="texto">${msg.texto}</span>`;
+      const hoje = new Date();
+      const ontem = new Date();
+      ontem.setDate(hoje.getDate() - 1);
+      // Zera horas para comparar só o dia
+      hoje.setHours(0,0,0,0);
+      ontem.setHours(0,0,0,0);
+      const dataMsg = new Date(data.getFullYear(), data.getMonth(), data.getDate());
+      let diaLabel = data.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' });
+      if (dataMsg.getTime() === ontem.getTime()) {
+        diaLabel = 'ontem';
+      }
+      li.innerHTML = `<span style="display:inline-block;"><span class="user" style="color:#00b0f4;font-weight:600;">${msg.usuario || 'Anônimo'}</span><span class="hora" style="margin-left:8px;color:#72767d;font-size:0.95em;font-weight:400;">${diaLabel} ${hora}</span></span><br><span class="texto">${msg.texto}</span>`;
       chat.appendChild(li);
       if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
     }
