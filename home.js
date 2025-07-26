@@ -24,7 +24,7 @@ async function ensureUsername() {
             }
         }
         // Se não conseguir, redireciona para login
-        window.location.href = "https://gabellaurent.github.io/projetoPessoalRP/index.html";
+        window.location.href = "index.html";
         return;
     }
     // Exibe o body após validação
@@ -87,7 +87,7 @@ document.getElementById('logout-btn').addEventListener('click', function(e) {
     localStorage.removeItem('username');
     // Encerra a sessão do Supabase
     supabase.auth.signOut().then(() => {
-        window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP/index.html';
+        window.location.href = 'index.html';
     });
 });
 

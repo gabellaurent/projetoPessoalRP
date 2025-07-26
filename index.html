@@ -177,7 +177,7 @@
         (async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user && user.id) {
-                window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP/home.html';
+                window.location.href = 'home.html';
                 return;
             }
         })();
@@ -342,8 +342,21 @@
             const password = document.getElementById('login-password').value;
             const msg = document.getElementById('login-message');
             const err = document.getElementById('login-error');
+            const btn = loginForm.querySelector('button[type="submit"]');
             msg.style.display = 'none';
             err.style.display = 'none';
+
+            // Adiciona animação de carregamento
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="display:inline-block;width:18px;height:18px;border:3px solid #fff;border-top:3px solid #6366f1;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;"></span>';
+
+            // Adiciona o CSS da animação
+            if (!document.getElementById('login-spinner-style')) {
+                const style = document.createElement('style');
+                style.id = 'login-spinner-style';
+                style.innerHTML = '@keyframes spin { 0% { transform: rotate(0deg);} 100% {transform: rotate(360deg);} }';
+                document.head.appendChild(style);
+            }
 
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
@@ -352,13 +365,19 @@
             if (error) {
                 err.textContent = error.message || 'Usuário ou senha inválidos.';
                 err.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = 'Entrar';
                 return;
             }
             msg.textContent = 'Login realizado com sucesso!';
             msg.style.display = 'block';
-            loginForm.reset();
+            // Ícone de OK
+            btn.innerHTML = '<span style="display:inline-block;font-size:1.3em;vertical-align:middle;color:#22c55e;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none"><path d="M20 7L10.5 17L4 10.5" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
             setTimeout(() => {
-                window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP/home.html';
+                btn.disabled = false;
+                btn.innerHTML = 'Entrar';
+                loginForm.reset();
+                window.location.href = 'home.html';
             }, 1200);
         });
     </script>
