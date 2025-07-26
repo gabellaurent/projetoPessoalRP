@@ -80,8 +80,15 @@
     if (root === document.body) document.body.innerHTML = '';
     var wrapper = document.createElement('div');
     wrapper.className = 'chat-wrapper';
+    // Botão de fechar chat
+    var closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Fechar Chat';
+    closeBtn.style.cssText = 'position:absolute;top:18px;right:18px;z-index:20;padding:7px 16px;border-radius:8px;background:#ef4444;color:#fff;border:none;cursor:pointer;font-weight:600;box-shadow:0 2px 8px #0002;';
+    closeBtn.onclick = function() {
+      if (root) root.innerHTML = '';
+    };
     wrapper.innerHTML = `
-      <div class="container">
+      <div class="container" style="position:relative;">
         <h1>Chat em Tempo Real</h1>
         <!-- Campo de identificação removido, usuário será pego do localStorage -->
         <div class="chat-box">
@@ -93,6 +100,7 @@
         </div>
       </div>
     `;
+    wrapper.querySelector('.container').appendChild(closeBtn);
     root.appendChild(wrapper);
 
     // Supabase config
