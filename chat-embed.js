@@ -11,7 +11,7 @@
 
   // CSS do chat
   var css = `
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #313338; margin: 0; padding: 0; }
+    /* body removido */
     #chat-root { position:fixed; bottom:0; right:0; width:420px; height:800px; z-index:9999; }
     .chat-wrapper { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
     .container { background:#36393f; padding:0; border-radius:12px; width:100%; height:100%; box-shadow:0 2px 24px 0 rgba(0,0,0,0.25); display:flex; flex-direction:column; overflow:hidden; }

@@ -16,6 +16,9 @@
         <div class="navbar-icons">
             <span class="icon" id="bellIcon"><i class="fa-regular fa-bell"></i></span>
             <span class="icon" id="chatIcon" title="Abrir Chat"><i class="fa-regular fa-comment"></i></span>
+            <span class="icon" id="criarPostagemBtn" title="Criar Postagem" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;cursor:pointer;font-weight:600;color:#fff;">
+              <i class="fa-solid fa-plus"></i> <span style="font-size:1em;">Criar Postagem</span>
+            </span>
             <span class="icon" id="userIcon"><i class="fa-regular fa-user"></i></span>
         </div>
     </div>
@@ -37,6 +40,49 @@
     </div>
     <script src="chat-embed.js"></script>
     <script type="module" src="home.js"></script>
+    <script>
+    // Reabrir o chat ao clicar no ícone de chat
+    document.addEventListener('DOMContentLoaded', function() {
+      var chatIcon = document.getElementById('chatIcon');
+      var chatRoot = document.getElementById('chat-root');
+      // Garante que o chat começa fechado
+      if (chatRoot) {
+        chatRoot.innerHTML = '';
+        chatRoot.style.display = 'none';
+      }
+      chatIcon.addEventListener('click', function() {
+        if (chatRoot && (chatRoot.innerHTML.trim() === '' || chatRoot.style.display === 'none')) {
+          // Remove o script antigo se existir
+          var oldScript = document.querySelector('script[src="chat-embed.js"]');
+          if (oldScript) oldScript.remove();
+          // Cria novo script
+          var script = document.createElement('script');
+          script.src = 'chat-embed.js';
+          document.body.appendChild(script);
+          chatRoot.style.display = '';
+        }
+      });
+
+      // Botão Criar Postagem
+      var criarBtn = document.getElementById('criarPostagemBtn');
+      criarBtn.addEventListener('click', function() {
+        // Remove main-content.js se existir para evitar conflito
+        var oldScript = document.querySelector('script[src="main-content.js"]');
+        if (oldScript) oldScript.remove();
+        // Carrega criar-postagem.js se necessário
+        if (!window.renderCriarPostagem) {
+          var script = document.createElement('script');
+          script.src = 'criar-postagem.js';
+          script.onload = function() {
+            window.renderCriarPostagem('.main-content');
+          };
+          document.body.appendChild(script);
+        } else {
+          window.renderCriarPostagem('.main-content');
+        }
+      });
+    });
+    </script>
     <script>
     // Reabrir o chat ao clicar no ícone de chat
     document.addEventListener('DOMContentLoaded', function() {

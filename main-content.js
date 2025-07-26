@@ -52,23 +52,28 @@ async function carregarPostagens(targetSelector) {
     return;
   }
 
-  target.innerHTML = data.map(post => `
-    <div class="reddit-post">
-      <div class="reddit-header">
-        <div class="reddit-avatar">${post.usuario ? post.usuario[0].toUpperCase() : 'A'}</div>
-        <span class="reddit-username">${post.usuario || 'anon_user'}</span>
-        <span class="reddit-time">${new Date(post.created_at).toLocaleString('pt-BR')}</span>
+  const username = localStorage.getItem('username');
+  target.innerHTML = data.map(post => {
+    const isOwner = username && post.usuario === username;
+    return `
+      <div class="reddit-post">
+        <div class="reddit-header">
+          <div class="reddit-avatar">${post.usuario ? post.usuario[0].toUpperCase() : 'A'}</div>
+          <span class="reddit-username">${post.usuario || 'anon_user'}</span>
+          <span class="reddit-time">${new Date(post.created_at).toLocaleString('pt-BR')}</span>
+        </div>
+        <div class="reddit-title">${post.titulo || ''}</div>
+        <div class="reddit-content">${post.conteudo || ''}</div>
+        <div class="reddit-actions">
+          <span class="reddit-action">▲ Upvote (${post.upvotes ?? 0})</span>
+          <span class="reddit-action">▼ Downvote (${post.downvotes ?? 0})</span>
+          <span class="reddit-action">💬 Comentar (${post.comentarios ?? 0})</span>
+          <span class="reddit-action">🔗 Compartilhar</span>
+          ${isOwner ? '<span class="reddit-action" style="color:#00b0f4;font-weight:600;">✏️ Editar</span>' : ''}
+        </div>
       </div>
-      <div class="reddit-title">${post.titulo || ''}</div>
-      <div class="reddit-content">${post.conteudo || ''}</div>
-      <div class="reddit-actions">
-        <span class="reddit-action">▲ Upvote (${post.upvotes ?? 0})</span>
-        <span class="reddit-action">▼ Downvote (${post.downvotes ?? 0})</span>
-        <span class="reddit-action">💬 Comentar (${post.comentarios ?? 0})</span>
-        <span class="reddit-action">🔗 Compartilhar</span>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // Para uso dinâmico: window.renderMainContent = renderMainContent;
