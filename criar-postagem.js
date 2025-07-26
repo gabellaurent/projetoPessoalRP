@@ -116,6 +116,19 @@ function renderCriarPostagem(targetSelector = '.main-content') {
         msg.textContent = 'Postagem publicada com sucesso!';
         msg.style.color = '#2ecc40';
         form.reset();
+        // Redireciona para main-content após publicar
+        setTimeout(function() {
+          if (!window.renderMainContent) {
+            var script = document.createElement('script');
+            script.src = 'main-content.js';
+            script.onload = function() {
+              window.renderMainContent('.main-content');
+            };
+            document.body.appendChild(script);
+          } else {
+            window.renderMainContent('.main-content');
+          }
+        }, 800); // pequeno delay para mostrar mensagem
       }
     });
   }
