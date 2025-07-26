@@ -74,10 +74,6 @@ async function carregarPostagens(targetSelector) {
       </div>
     `;
   }).join('');
-  // Scrolla para a última postagem
-  if (target.lastElementChild) {
-    target.lastElementChild.scrollIntoView({ behavior: 'smooth' });
-  }
 }
 
 // Para uso dinâmico: window.renderMainContent = renderMainContent;
