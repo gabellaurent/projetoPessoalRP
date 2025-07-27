@@ -41,12 +41,14 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
       target.innerHTML = `<p style='color:#e74c3c;text-align:center;'>Postagem não encontrada.</p>`;
       return;
     }
-    // Formata o conteúdo para exibir quebra de linha, negrito e itálico
+    // Formata o conteúdo para exibir quebra de linha, negrito, itálico e imagens
     let conteudoFormatado = data.conteudo || '';
     conteudoFormatado = conteudoFormatado
       .replace(/\n/g, '<br>')
       .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-      .replace(/\*(.*?)\*/g, '<i>$1</i>');
+      .replace(/\*(.*?)\*/g, '<i>$1</i>')
+      // Detecta links de imagens e renderiza como <img>
+      .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:100%;margin:10px 0;border-radius:8px;">');
     target.innerHTML = `
       <div style="max-width:600px;margin:40px auto;border-radius:12px;padding:32px 32px 24px 32px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
