@@ -42,68 +42,100 @@ function renderMainContent(targetSelector = '#mainContentPosts') {
 async function carregarPostagens(targetSelector) {
   const target = document.querySelector(targetSelector);
   if (!target) return;
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .order('created_at', { ascending: false });
 
-  if (error || !data || data.length === 0) {
-    target.innerHTML = '<p style="color:#fff;text-align:center;">Nenhuma postagem encontrada.</p>';
-    return;
+  let page = 0;
+  const PAGE_SIZE_INITIAL = 10;
+  const PAGE_SIZE_MORE = 5;
+  let allLoaded = false;
+  let posts = [];
+
+  async function loadPosts() {
+    if (allLoaded) return;
+    const pageSize = page === 0 ? PAGE_SIZE_INITIAL : PAGE_SIZE_MORE;
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(page * PAGE_SIZE_INITIAL + (page > 0 ? (PAGE_SIZE_MORE * (page - 1)) : 0), page * PAGE_SIZE_INITIAL + (page > 0 ? (PAGE_SIZE_MORE * page - 1) : (PAGE_SIZE_INITIAL - 1)));
+    if (error || !data || data.length === 0) {
+      if (page === 0) {
+        target.innerHTML = '<p style="color:#fff;text-align:center;">Nenhuma postagem encontrada.</p>';
+      }
+      allLoaded = true;
+      return;
+    }
+    if (data.length < (page === 0 ? PAGE_SIZE_INITIAL : PAGE_SIZE_MORE)) {
+      allLoaded = true;
+    }
+    posts = posts.concat(data);
+    renderPosts();
+    page++;
   }
 
-  const username = localStorage.getItem('username');
-  target.innerHTML = data.map(post => {
-    const isOwner = username && post.usuario === username;
-    return `
-      <div class="reddit-post" data-id="${post.id}">
-        <div class="reddit-header">
-          <div class="reddit-avatar">${post.usuario ? post.usuario[0].toUpperCase() : 'A'}</div>
-          <span class="reddit-username">${post.usuario || 'anon_user'}</span>
-          <span class="reddit-time">${new Date(post.created_at).toLocaleString('pt-BR')}</span>
+  function renderPosts() {
+    const username = localStorage.getItem('username');
+    target.innerHTML = posts.map(post => {
+      const isOwner = username && post.usuario === username;
+      return `
+        <div class="reddit-post" data-id="${post.id}">
+          <div class="reddit-header">
+            <div class="reddit-avatar">${post.usuario ? post.usuario[0].toUpperCase() : 'A'}</div>
+            <span class="reddit-username">${post.usuario || 'anon_user'}</span>
+            <span class="reddit-time">${new Date(post.created_at).toLocaleString('pt-BR')}</span>
+          </div>
+          <div class="reddit-title" data-click="titulo" style="cursor:pointer;">${post.titulo || ''}</div>
+          <div class="reddit-content" data-click="conteudo" style="cursor:pointer;">${post.conteudo || ''}</div>
+          <div class="reddit-actions">
+            <span class="reddit-action">▲ Upvote (${post.upvotes ?? 0})</span>
+            <span class="reddit-action">▼ Downvote (${post.downvotes ?? 0})</span>
+            <span class="reddit-action">💬 Comentar (${post.comentarios ?? 0})</span>
+            <span class="reddit-action">🔗 Compartilhar</span>
+            ${isOwner ? '<span class="reddit-action" style="color:#00b0f4;font-weight:600;">✏️ Editar</span>' : ''}
+          </div>
         </div>
-        <div class="reddit-title" data-click="titulo" style="cursor:pointer;">${post.titulo || ''}</div>
-        <div class="reddit-content" data-click="conteudo" style="cursor:pointer;">${post.conteudo || ''}</div>
-        <div class="reddit-actions">
-          <span class="reddit-action">▲ Upvote (${post.upvotes ?? 0})</span>
-          <span class="reddit-action">▼ Downvote (${post.downvotes ?? 0})</span>
-          <span class="reddit-action">💬 Comentar (${post.comentarios ?? 0})</span>
-          <span class="reddit-action">🔗 Compartilhar</span>
-          ${isOwner ? '<span class="reddit-action" style="color:#00b0f4;font-weight:600;">✏️ Editar</span>' : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
 
-  // Adiciona event listener para título e corpo
-  target.querySelectorAll('.reddit-title, .reddit-content').forEach(function(el) {
-    el.addEventListener('click', function(e) {
-      const postDiv = el.closest('.reddit-post');
-      if (postDiv) {
-        const postId = postDiv.getAttribute('data-id');
-        localStorage.setItem('post_uuid_clicked', postId);
-        // Limpa a área main-content
-        const mainContentArea = document.querySelector('.main-content');
-        if (mainContentArea) {
-          while (mainContentArea.firstChild) {
-            mainContentArea.removeChild(mainContentArea.firstChild);
+    // Adiciona event listener para título e corpo
+    target.querySelectorAll('.reddit-title, .reddit-content').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        const postDiv = el.closest('.reddit-post');
+        if (postDiv) {
+          const postId = postDiv.getAttribute('data-id');
+          localStorage.setItem('post_uuid_clicked', postId);
+          // Limpa a área main-content
+          const mainContentArea = document.querySelector('.main-content');
+          if (mainContentArea) {
+            while (mainContentArea.firstChild) {
+              mainContentArea.removeChild(mainContentArea.firstChild);
+            }
+          }
+          // Carrega post-detalhe.js se necessário
+          if (!window.renderPostDetalhe) {
+            var script = document.createElement('script');
+            script.src = 'post-detalhe.js';
+            script.onload = function() {
+              window.renderPostDetalhe(postId, '.main-content');
+            };
+            document.body.appendChild(script);
+          } else {
+            window.renderPostDetalhe(postId, '.main-content');
           }
         }
-        // Carrega post-detalhe.js se necessário
-        if (!window.renderPostDetalhe) {
-          var script = document.createElement('script');
-          script.src = 'post-detalhe.js';
-          script.onload = function() {
-            window.renderPostDetalhe(postId, '.main-content');
-          };
-          document.body.appendChild(script);
-        } else {
-          window.renderPostDetalhe(postId, '.main-content');
-        }
-      }
-      e.stopPropagation();
+        e.stopPropagation();
+      });
     });
+  }
+
+  // Detecta rolagem até o final para carregar mais
+  target.addEventListener('scroll', function() {
+    if (target.scrollTop + target.clientHeight >= target.scrollHeight - 10 && !allLoaded) {
+      loadPosts();
+    }
   });
+
+  // Inicializa carregamento
+  loadPosts();
 }
 
 // Para uso dinâmico: window.renderMainContent = renderMainContent;
