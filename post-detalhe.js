@@ -49,28 +49,28 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
       .replace(/\*(.*?)\*/g, '<i>$1</i>')
       // Detecta links de imagens e renderiza como <img>
       .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:100%;margin:10px 0;border-radius:8px;">');
-    target.innerHTML = `
-      <div style="max-width:600px;margin:40px auto;border-radius:12px;padding:32px 32px 24px 32px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-          <div style="width:38px;height:38px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
-          <span style="color:#00b0f4;font-weight:600;font-size:1rem;">${data.usuario || 'anon_user'}</span>
-          <span style="color:#aaa;font-size:0.95rem;margin-left:8px;">${new Date(data.created_at).toLocaleString('pt-BR')}</span>
-        </div>
-        <div style="color:#fff;font-size:1.35rem;font-weight:700;margin-bottom:10px;">${data.titulo || ''}</div>
-        <div style="color:#dcddde;font-size:1.1rem;margin-bottom:18px;">${conteudoFormatado}</div>
-        <div id="comentarios-section" style="margin-top:32px;">
-          <h3 style="color:#00b0f4;margin-bottom:10px;">Comentários</h3>
-          <div style="display:flex;gap:10px;margin-bottom:16px;">
-            <input id="comentarioInput" type="text" placeholder="Escreva seu comentário..." style="flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;">
-            <button id="enviarComentarioBtn" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer;">Enviar</button>
+        target.innerHTML = `
+          <div style="max-width:600px;margin:40px auto;border-radius:12px;padding:32px 32px 24px 32px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <div style="width:38px;height:38px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
+              <span style="color:#00b0f4;font-weight:600;font-size:1rem;">${data.usuario || 'anon_user'}</span>
+              <span style="color:#aaa;font-size:0.95rem;margin-left:8px;">${new Date(data.created_at).toLocaleString('pt-BR')}</span>
+            </div>
+            <div style="color:#fff;font-size:1.35rem;font-weight:700;margin-bottom:10px;">${data.titulo || ''}</div>
+            <div style="color:#dcddde;font-size:1.1rem;margin-bottom:18px;">${conteudoFormatado}</div>
+            <div id="comentarios-section" style="margin-top:32px;">
+              <h3 style="color:#00b0f4;margin-bottom:10px;">Comentários <span id="comentariosCount" style="color:#fff;font-size:1rem;font-weight:400;margin-left:8px;"></span></h3>
+              <div style="display:flex;gap:10px;margin-bottom:16px;">
+                <input id="comentarioInput" type="text" placeholder="Escreva seu comentário..." style="flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;">
+                <button id="enviarComentarioBtn" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer;">Enviar</button>
+              </div>
+              <div id="listaComentarios"></div>
+            </div>
+            <div style="margin-top:24px;text-align:center;">
+              <button id="voltarMainContent" style="background:#5865f2;color:#fff;border:none;border-radius:6px;padding:12px 32px;font-size:1.1rem;font-weight:600;cursor:pointer;">Voltar</button>
+            </div>
           </div>
-          <div id="listaComentarios"></div>
-        </div>
-        <div style="margin-top:24px;text-align:center;">
-          <button id="voltarMainContent" style="background:#5865f2;color:#fff;border:none;border-radius:6px;padding:12px 32px;font-size:1.1rem;font-weight:600;cursor:pointer;">Voltar</button>
-        </div>
-      </div>
-    `;
+        `;
     // Botão voltar para main-content
     const voltarBtn = document.getElementById('voltarMainContent');
     if (voltarBtn) {
@@ -100,10 +100,13 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
         lista.innerHTML = '<p style="color:#e74c3c;">Erro ao carregar comentários.</p>';
         return;
       }
+      const comentariosCountSpan = document.getElementById('comentariosCount');
       if (!comentarios || comentarios.length === 0) {
         lista.innerHTML = '<p style="color:#aaa;">Nenhum comentário ainda.</p>';
+        if (comentariosCountSpan) comentariosCountSpan.textContent = '(0)';
         return;
       }
+      if (comentariosCountSpan) comentariosCountSpan.textContent = `(${comentarios.length})`;
       // Busca os nomes dos usuários em lote
       const usuarioIds = comentarios.map(c => c.usuario_id);
       const { data: usuarios } = await supabase

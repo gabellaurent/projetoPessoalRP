@@ -48,6 +48,7 @@ async function carregarPostagens(targetSelector) {
   const PAGE_SIZE_MORE = 5;
   let allLoaded = false;
   let posts = [];
+  let comentariosPorPost = {};
 
   function addLoadMoreButton() {
     let btn = document.getElementById('btnLoadMorePosts');
@@ -86,6 +87,21 @@ async function carregarPostagens(targetSelector) {
       allLoaded = true;
     }
     posts = posts.concat(data);
+    // Busca a contagem de comentários para os posts carregados
+    const postIds = data.map(post => post.id);
+    if (postIds.length > 0) {
+      const { data: comentariosData } = await supabase
+        .from('comments')
+        .select('post_id', { count: 'exact', head: false })
+        .in('post_id', postIds);
+      // Calcula a contagem por post
+      comentariosPorPost = {};
+      if (comentariosData) {
+        postIds.forEach(id => {
+          comentariosPorPost[id] = comentariosData.filter(c => c.post_id === id).length;
+        });
+      }
+    }
     renderPosts();
     page++;
   }
@@ -102,6 +118,7 @@ async function carregarPostagens(targetSelector) {
         .replace(/\*(.*?)\*/g, '<i>$1</i>')
         // Detecta links de imagens e renderiza como <img> com tamanho reduzido
         .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:320px;max-height:220px;margin:10px 0;border-radius:8px;object-fit:cover;">');
+      const comentariosCount = comentariosPorPost[post.id] ?? 0;
       return `
         <div class="reddit-post" data-id="${post.id}">
           <div class="reddit-header">
@@ -114,7 +131,7 @@ async function carregarPostagens(targetSelector) {
           <div class="reddit-actions">
             <span class="reddit-action">▲ Upvote (${post.upvotes ?? 0})</span>
             <span class="reddit-action">▼ Downvote (${post.downvotes ?? 0})</span>
-            <span class="reddit-action">💬 Comentar (${post.comentarios ?? 0})</span>
+            <span class="reddit-action">💬 Comentários (${comentariosCount})</span>
             <span class="reddit-action">🔗 Compartilhar</span>
           </div>
         </div>
