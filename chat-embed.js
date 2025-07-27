@@ -107,7 +107,9 @@
     var closeBtn = wrapper.querySelector('#close-chat');
     if (closeBtn) {
       closeBtn.onclick = function() {
-        if (root) root.innerHTML = '';
+        if (root && root.parentNode) {
+          root.parentNode.removeChild(root);
+        }
       };
     }
 

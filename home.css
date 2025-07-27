@@ -4,8 +4,7 @@
 body {
     margin: 0;
     font-family: 'Montserrat', Arial, sans-serif;
-    background: linear-gradient(135deg, #7fa7d6 0%, #3b5998 100%);
-    color: #fff;
+    color: #23272f;
 }
 h1{
     font-family: 'Inter', Arial, sans-serif;;
@@ -15,7 +14,6 @@ h1{
     align-items: center;
     background: #23272f;
     border-bottom: 1px solid #2d3b49;
-    padding: 0 0 0 20px;
     height: 56px;
     position: relative;
     z-index: 1000;
@@ -83,7 +81,7 @@ h1{
     top: 56px;
     right: 0;
     width: 220px;
-    background: #23395d;
+    background: #1c1f25;
     padding: 24px 24px 24px 24px;
     box-sizing: border-box;
     color: #fff;
@@ -107,9 +105,4 @@ h1{
     text-decoration: underline;
     font-size: 1.05rem;
 }
-@media (max-width: 700px) {
-    .navbar-search input { width: 180px; }
-    .sidebar { width: 120px; }
-    .main-content { margin-left: 120px; }
-    .profile-panel { width: 150px; padding: 16px; }
-}
+
