@@ -56,7 +56,7 @@ async function carregarPostagens(targetSelector) {
   target.innerHTML = data.map(post => {
     const isOwner = username && post.usuario === username;
     return `
-      <div class="reddit-post">
+      <div class="reddit-post" data-id="${post.id}">
         <div class="reddit-header">
           <div class="reddit-avatar">${post.usuario ? post.usuario[0].toUpperCase() : 'A'}</div>
           <span class="reddit-username">${post.usuario || 'anon_user'}</span>
