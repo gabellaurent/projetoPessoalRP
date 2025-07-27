@@ -55,7 +55,7 @@ async function carregarPostagens(targetSelector) {
       btn = document.createElement('button');
       btn.id = 'btnLoadMorePosts';
       btn.textContent = 'Carregar mais postagens';
-      btn.style = 'display:block;margin:24px auto 0 auto;padding:12px 28px;font-size:1.1rem;background:#5865f2;color:#fff;border:none;border-radius:6px;cursor:pointer;';
+      btn.style = 'display:block;margin:24px auto 0 auto;padding:12px 28px;font-size:1.1rem;background:#5865f2;color:#fff;border:none;border-radius:6px;cursor:pointer; margin-bottom: 20px;';
       btn.onclick = function() {
         loadPosts();
       };
