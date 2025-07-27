@@ -62,8 +62,8 @@ async function carregarPostagens(targetSelector) {
           <span class="reddit-username">${post.usuario || 'anon_user'}</span>
           <span class="reddit-time">${new Date(post.created_at).toLocaleString('pt-BR')}</span>
         </div>
-        <div class="reddit-title">${post.titulo || ''}</div>
-        <div class="reddit-content">${post.conteudo || ''}</div>
+        <div class="reddit-title" data-click="titulo" style="cursor:pointer;">${post.titulo || ''}</div>
+        <div class="reddit-content" data-click="conteudo" style="cursor:pointer;">${post.conteudo || ''}</div>
         <div class="reddit-actions">
           <span class="reddit-action">▲ Upvote (${post.upvotes ?? 0})</span>
           <span class="reddit-action">▼ Downvote (${post.downvotes ?? 0})</span>
@@ -74,6 +74,36 @@ async function carregarPostagens(targetSelector) {
       </div>
     `;
   }).join('');
+
+  // Adiciona event listener para título e corpo
+  target.querySelectorAll('.reddit-title, .reddit-content').forEach(function(el) {
+    el.addEventListener('click', function(e) {
+      const postDiv = el.closest('.reddit-post');
+      if (postDiv) {
+        const postId = postDiv.getAttribute('data-id');
+        localStorage.setItem('post_uuid_clicked', postId);
+        // Limpa a área main-content
+        const mainContentArea = document.querySelector('.main-content');
+        if (mainContentArea) {
+          while (mainContentArea.firstChild) {
+            mainContentArea.removeChild(mainContentArea.firstChild);
+          }
+        }
+        // Carrega post-detalhe.js se necessário
+        if (!window.renderPostDetalhe) {
+          var script = document.createElement('script');
+          script.src = 'post-detalhe.js';
+          script.onload = function() {
+            window.renderPostDetalhe(postId, '.main-content');
+          };
+          document.body.appendChild(script);
+        } else {
+          window.renderPostDetalhe(postId, '.main-content');
+        }
+      }
+      e.stopPropagation();
+    });
+  });
 }
 
 // Para uso dinâmico: window.renderMainContent = renderMainContent;
