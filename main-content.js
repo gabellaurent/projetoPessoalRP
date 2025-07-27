@@ -1,4 +1,4 @@
-  // Adiciona CSS das postagens se ainda não estiver presente
+// Adiciona CSS das postagens se ainda não estiver presente
   if (!document.getElementById('main-content-style')) {
     const style = document.createElement('style');
     style.id = 'main-content-style';
@@ -49,6 +49,23 @@ async function carregarPostagens(targetSelector) {
   let allLoaded = false;
   let posts = [];
 
+  function addLoadMoreButton() {
+    let btn = document.getElementById('btnLoadMorePosts');
+    if (!btn && !allLoaded) {
+      btn = document.createElement('button');
+      btn.id = 'btnLoadMorePosts';
+      btn.textContent = 'Carregar mais postagens';
+      btn.style = 'display:block;margin:24px auto 0 auto;padding:12px 28px;font-size:1.1rem;background:#5865f2;color:#fff;border:none;border-radius:6px;cursor:pointer;';
+      btn.onclick = function() {
+        loadPosts();
+      };
+      target.appendChild(btn);
+    }
+    if (btn && allLoaded) {
+      btn.remove();
+    }
+  }
+
   async function loadPosts() {
     if (allLoaded) return;
     const pageSize = page === 0 ? PAGE_SIZE_INITIAL : PAGE_SIZE_MORE;
@@ -62,6 +79,7 @@ async function carregarPostagens(targetSelector) {
         target.innerHTML = '<p style="color:#fff;text-align:center;">Nenhuma postagem encontrada.</p>';
       }
       allLoaded = true;
+      addLoadMoreButton();
       return;
     }
     if (data.length < (page === 0 ? PAGE_SIZE_INITIAL : PAGE_SIZE_MORE)) {
@@ -76,6 +94,12 @@ async function carregarPostagens(targetSelector) {
     const username = localStorage.getItem('username');
     target.innerHTML = posts.map(post => {
       const isOwner = username && post.usuario === username;
+      // Formatação: quebra de linha, negrito e itálico
+      let conteudoFormatado = post.conteudo || '';
+      conteudoFormatado = conteudoFormatado
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+        .replace(/\*(.*?)\*/g, '<i>$1</i>');
       return `
         <div class="reddit-post" data-id="${post.id}">
           <div class="reddit-header">
@@ -84,13 +108,12 @@ async function carregarPostagens(targetSelector) {
             <span class="reddit-time">${new Date(post.created_at).toLocaleString('pt-BR')}</span>
           </div>
           <div class="reddit-title" data-click="titulo" style="cursor:pointer;">${post.titulo || ''}</div>
-          <div class="reddit-content" data-click="conteudo" style="cursor:pointer;">${post.conteudo || ''}</div>
+          <div class="reddit-content" data-click="conteudo" style="cursor:pointer;">${conteudoFormatado}</div>
           <div class="reddit-actions">
             <span class="reddit-action">▲ Upvote (${post.upvotes ?? 0})</span>
             <span class="reddit-action">▼ Downvote (${post.downvotes ?? 0})</span>
             <span class="reddit-action">💬 Comentar (${post.comentarios ?? 0})</span>
             <span class="reddit-action">🔗 Compartilhar</span>
-            ${isOwner ? '<span class="reddit-action" style="color:#00b0f4;font-weight:600;">✏️ Editar</span>' : ''}
           </div>
         </div>
       `;
@@ -125,14 +148,8 @@ async function carregarPostagens(targetSelector) {
         e.stopPropagation();
       });
     });
+    addLoadMoreButton();
   }
-
-  // Detecta rolagem até o final para carregar mais
-  target.addEventListener('scroll', function() {
-    if (target.scrollTop + target.clientHeight >= target.scrollHeight - 10 && !allLoaded) {
-      loadPosts();
-    }
-  });
 
   // Inicializa carregamento
   loadPosts();

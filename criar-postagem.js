@@ -30,7 +30,10 @@ function renderCriarPostagem(targetSelector = '.main-content') {
           <label for="titulo">Título</label>
           <input type="text" id="titulo" name="titulo" maxlength="80" required>
           <label for="conteudo">Conteúdo</label>
-          <textarea id="conteudo" name="conteudo" maxlength="1000" required></textarea>
+          <textarea id="conteudo" name="conteudo" maxlength="5000" required placeholder="Você pode usar *itálico* e **negrito**. Quebra de linha também é permitida."></textarea>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span id="contadorCaracteres" style="color:#aaa;font-size:0.98em;">0/5000</span>
+          </div>
           <div style="display:flex;gap:12px;justify-content:flex-end;align-items:center;margin-top:8px;">
             <button id="voltarMainContent" type="button" style="background:#5865f2;color:#fff;border:none;border-radius:6px;padding:12px 0;font-size:1.1rem;font-weight:600;cursor:pointer;flex:1;display:flex;align-items:center;justify-content:center;transition:background 0.2s;">
               <i class="fa-solid fa-arrow-left" style="margin-right:6px;"></i> Voltar
@@ -81,6 +84,20 @@ function renderCriarPostagem(targetSelector = '.main-content') {
     }
     const form = document.getElementById('postForm');
     const msg = document.getElementById('msg');
+    const conteudoInput = document.getElementById('conteudo');
+    const contador = document.getElementById('contadorCaracteres');
+    if (conteudoInput && contador) {
+      conteudoInput.addEventListener('input', function() {
+        contador.textContent = conteudoInput.value.length + '/5000';
+        if (conteudoInput.value.length > 5000) {
+          contador.style.color = '#e74c3c';
+        } else {
+          contador.style.color = '#aaa';
+        }
+      });
+      // Inicializa contador
+      contador.textContent = conteudoInput.value.length + '/5000';
+    }
     if (!form) return;
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
