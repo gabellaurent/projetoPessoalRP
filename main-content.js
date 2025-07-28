@@ -114,14 +114,27 @@ async function carregarPostagens(targetSelector) {
     const username = localStorage.getItem('username');
     target.innerHTML = posts.map(post => {
       const isOwner = username && post.usuario === username;
-      // Formatação: quebra de linha, negrito e itálico
+      // Formatação: imagens, vídeos, negrito, itálico, quebra de linha
       let conteudoFormatado = post.conteudo || '';
       conteudoFormatado = conteudoFormatado
-        .replace(/\n/g, '<br>')
-        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-        .replace(/\*(.*?)\*/g, '<i>$1</i>')
-        // Detecta links de imagens e renderiza como <img> com tamanho reduzido
-        .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:320px;max-height:220px;margin:10px 0;border-radius:8px;object-fit:cover;">');
+        // Links de imagem
+        .replace(/(https?:\/\/(?:[\w.-]+)\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/gi, '<img src="$1" alt="imagem" style="max-width:320px;max-height:220px;margin:10px 0;border-radius:8px;object-fit:cover;">')
+        // Vídeos do YouTube
+        .replace(/(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+))/gi, function(match, url, id) {
+          let videoId = id;
+          if (url.includes('watch?v=')) {
+            const params = new URLSearchParams(url.split('watch?v=')[1]);
+            videoId = params.get('') || url.split('watch?v=')[1];
+            if (videoId && videoId.includes('&')) videoId = videoId.split('&')[0];
+          }
+          return `<iframe width="320" height="220" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="margin:10px 0;border-radius:8px;max-width:100%;display:block;"></iframe>`;
+        })
+        // Negrito
+        .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+        // Itálico
+        .replace(/\*([^*]+)\*/g, '<i>$1</i>')
+        // Quebra de linha
+        .replace(/\n/g, '<br>');
       const comentariosCount = comentariosPorPost[post.id] ?? 0;
       return `
         <div class="reddit-post" data-id="${post.id}">

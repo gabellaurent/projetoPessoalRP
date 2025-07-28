@@ -29,6 +29,8 @@ function renderCriarPostagem(targetSelector = '.main-content') {
         <form id="postForm">
           <label for="titulo">Título</label>
           <input type="text" id="titulo" name="titulo" maxlength="80" required>
+          <label style="color:#00b0f4;font-weight:600;margin-bottom:4px;display:block;">Pré-visualização:</label>
+          <div id="previewConteudo" style="background:#23272a;border-radius:6px;padding:12px;min-height:80px;color:#fff;font-size:1rem;white-space:pre-wrap;margin-bottom:18px;"></div>
           <label for="conteudo">Conteúdo</label>
           <textarea id="conteudo" name="conteudo" maxlength="5000" required placeholder="Você pode usar *itálico* e **negrito**. Quebra de linha também é permitida."></textarea>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -86,7 +88,32 @@ function renderCriarPostagem(targetSelector = '.main-content') {
     const msg = document.getElementById('msg');
     const conteudoInput = document.getElementById('conteudo');
     const contador = document.getElementById('contadorCaracteres');
-    if (conteudoInput && contador) {
+    const preview = document.getElementById('previewConteudo');
+    function renderPreview(text) {
+      if (!preview) return;
+      let html = text
+        // Links de imagem
+        .replace(/(https?:\/\/(?:[\w.-]+)\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/gi, '<img src="$1" alt="imagem" style="max-width:100%;margin:8px 0;border-radius:8px;">')
+        // Vídeos do YouTube
+        .replace(/(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+))/gi, function(match, url, id) {
+          let videoId = id;
+          // Para youtube.com/watch?v=...
+          if (url.includes('watch?v=')) {
+            const params = new URLSearchParams(url.split('watch?v=')[1]);
+            videoId = params.get('') || url.split('watch?v=')[1];
+            if (videoId && videoId.includes('&')) videoId = videoId.split('&')[0];
+          }
+          return `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="margin:8px 0;border-radius:8px;"></iframe>`;
+        })
+        // Negrito
+        .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+        // Itálico
+        .replace(/\*([^*]+)\*/g, '<i>$1</i>')
+        // Quebra de linha
+        .replace(/\n/g, '<br>');
+      preview.innerHTML = html;
+    }
+    if (conteudoInput && contador && preview) {
       conteudoInput.addEventListener('input', function() {
         contador.textContent = conteudoInput.value.length + '/5000';
         if (conteudoInput.value.length > 5000) {
@@ -94,9 +121,11 @@ function renderCriarPostagem(targetSelector = '.main-content') {
         } else {
           contador.style.color = '#aaa';
         }
+        renderPreview(conteudoInput.value);
       });
-      // Inicializa contador
+      // Inicializa contador e preview
       contador.textContent = conteudoInput.value.length + '/5000';
+      renderPreview(conteudoInput.value);
     }
     if (!form) return;
     form.addEventListener('submit', async function(e) {

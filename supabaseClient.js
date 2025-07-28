@@ -10,15 +10,22 @@
 (function() {
   const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
+  let singletonClient = null;
   function loadSupabase(callback) {
+    function createOrReturnClient() {
+      if (!singletonClient) {
+        singletonClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+      }
+      callback(singletonClient);
+    }
     if (window.supabase && window.supabase.createClient) {
-      callback(window.supabase.createClient(supabaseUrl, supabaseKey));
+      createOrReturnClient();
       return;
     }
     var script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js';
     script.onload = function() {
-      callback(window.supabase.createClient(supabaseUrl, supabaseKey));
+      createOrReturnClient();
     };
     document.head.appendChild(script);
   }
