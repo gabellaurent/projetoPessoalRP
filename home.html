@@ -9,7 +9,7 @@
 </head>
 <body style="display:none;">
     <div class="navbar">
-        <span class="navbar-title">MinhaApp</span>
+        <a class="navbar-title" href="#" id="homeLink">MinhaApp</a>
         <div class="navbar-search">
             <input type="text" placeholder="Pesquisar aqui..">
         </div>
@@ -43,6 +43,27 @@
     </div>
     <script src="chat-embed.js"></script>
     <script type="module" src="home.js"></script>
+    <script>
+      // Carrega main-content.js dinamicamente ao clicar no título
+      document.addEventListener('DOMContentLoaded', function() {
+        var homeLink = document.getElementById('homeLink');
+        if (homeLink) {
+          homeLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Remove o script antigo se existir
+            var oldScript = document.querySelector('script[src="main-content.js"]');
+            if (oldScript) oldScript.remove();
+            // Cria novo script
+            var script = document.createElement('script');
+            script.src = 'main-content.js';
+            script.onload = function() {
+              if (window.renderMainContent) window.renderMainContent('.main-content');
+            };
+            document.body.appendChild(script);
+          });
+        }
+      });
+    </script>
     <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
     const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
