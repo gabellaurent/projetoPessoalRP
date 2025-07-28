@@ -1,3 +1,53 @@
+// --- Controle de abertura do chat ---
+window.chatIsOpen = false;
+document.addEventListener('DOMContentLoaded', function() {
+  var chatIcon = document.getElementById('chatIcon');
+  var chatRoot = document.getElementById('chat-root');
+  var chatBadge = document.getElementById('chat-badge');
+  // Função para resetar badge ao abrir o chat
+  function resetChatBadge() {
+    if (chatBadge) {
+      chatBadge.style.display = 'none';
+      chatBadge.textContent = '0';
+    }
+    // Salva o último id da mensagem lida
+    supabase
+      .from('meu-chat')
+      .select('id')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          localStorage.setItem('lastChatMsgId', data[0].id);
+        }
+      });
+  }
+  chatIcon.addEventListener('click', function() {
+    // Só cria o chat se ele não estiver aberto
+    if (window.chatIsOpen === true) {
+      // Se o chat-root estiver oculto, mostra
+      if (chatRoot && chatRoot.style.display === 'none') {
+        chatRoot.style.display = '';
+        // Não recarrega mensagens, só mostra o chat já existente
+      }
+      // Zera badge
+      resetChatBadge();
+      return;
+    }
+    // Zera badge imediatamente ao clicar, mesmo antes do chat renderizar
+    resetChatBadge();
+    if (chatRoot && (chatRoot.innerHTML.trim() === '' || chatRoot.style.display === 'none')) {
+      // Remove o script antigo se existir
+      var oldScript = document.querySelector('script[src="chat-embed.js"]');
+      if (oldScript) oldScript.remove();
+      // Cria novo script
+      var script = document.createElement('script');
+      script.src = 'chat-embed.js';
+      document.body.appendChild(script);
+      chatRoot.style.display = '';
+    }
+  });
+});
 
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
