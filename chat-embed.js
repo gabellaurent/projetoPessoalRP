@@ -13,6 +13,31 @@
   var css = `
     /* body removido */
     #chat-root { position:fixed; bottom:0; right:0; width:420px; height:800px; z-index:9999; }
+    .resize-handle {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 2px;
+      top: 2px;
+      cursor: nw-resize;
+      z-index: 10000;
+      background: linear-gradient(225deg, #23272a 60%, #5865f2 100%);
+      border-radius: 4px;
+      opacity: 0.7;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    .resize-handle:after {
+      content: '';
+      display: block;
+      width: 14px;
+      height: 14px;
+      border-left: 2px solid #fff;
+      border-top: 2px solid #fff;
+      margin: 2px 0 0 2px;
+      opacity: 0.7;
+    }
     .chat-wrapper { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
     .container { background:#36393f; padding:0; border-radius:12px; width:100%; height:100%; box-shadow:0 2px 24px 0 rgba(0,0,0,0.25); display:flex; flex-direction:column; overflow:hidden; }
     h1 { color: #fff; font-size: 1.4rem; font-weight: 600; background: #10151a; margin: 0; padding: 18px 0 12px 0; border-radius: 12px 12px 0 0; letter-spacing: 1px; width: 100%; box-sizing: border-box; text-align: center; border-bottom: 1px solid #2d3b49; }
@@ -85,7 +110,7 @@
     root.innerHTML = '';
     var wrapper = document.createElement('div');
     wrapper.className = 'chat-wrapper';
-    // Nova aba de título com botão 'x'
+    // Nova aba de título com botão 'x' e handle de resize
     wrapper.innerHTML = `
       <div class="container" style="position:relative;">
         <div class="chat-tab" style="position:relative;display:flex;align-items:center;justify-content:center;background:#10151a;border-radius:12px 12px 0 0;border-bottom:1px solid #2d3b49;padding:0;">
@@ -100,9 +125,52 @@
           <textarea id="mensagem" placeholder="Digite sua mensagem..." maxlength="500"></textarea>
           <button id="enviar">Enviar</button>
         </div>
+        <div class="resize-handle" id="resize-handle"></div>
       </div>
     `;
     root.appendChild(wrapper);
+    // Redimensionamento da janela do chat
+    (function enableResize() {
+      const chatRoot = document.getElementById('chat-root');
+      const handle = document.getElementById('resize-handle');
+      if (!chatRoot || !handle) return;
+      let isResizing = false;
+      let startX, startY, startWidth, startHeight;
+      const minWidth = 320, minHeight = 400, maxWidth = 900, maxHeight = 1200;
+      handle.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = parseInt(document.defaultView.getComputedStyle(chatRoot).width, 10);
+        startHeight = parseInt(document.defaultView.getComputedStyle(chatRoot).height, 10);
+        document.documentElement.style.userSelect = 'none';
+      });
+      document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+        // Mantém o canto inferior direito fixo (igual Reddit)
+        let deltaX = e.clientX - startX;
+        let deltaY = e.clientY - startY;
+        let newWidth = Math.min(Math.max(startWidth - deltaX, minWidth), maxWidth);
+        let newHeight = Math.min(Math.max(startHeight - deltaY, minHeight), maxHeight);
+        // Garante que não ultrapasse a viewport
+        newWidth = Math.min(newWidth, window.innerWidth);
+        newHeight = Math.min(newHeight, window.innerHeight);
+        chatRoot.style.width = newWidth + 'px';
+        chatRoot.style.height = newHeight + 'px';
+        // Mantém sempre ancorado no canto inferior direito
+        chatRoot.style.right = '0';
+        chatRoot.style.bottom = '0';
+        chatRoot.style.left = '';
+        chatRoot.style.top = '';
+      });
+      document.addEventListener('mouseup', function() {
+        if (isResizing) {
+          isResizing = false;
+          document.documentElement.style.userSelect = '';
+        }
+      });
+    })();
     // Botão 'x' para fechar
     var closeBtn = wrapper.querySelector('#close-chat');
     if (closeBtn) {
