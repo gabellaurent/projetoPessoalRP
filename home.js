@@ -1,3 +1,18 @@
+// Carrega main-content.js automaticamente ao abrir o site
+window.addEventListener('DOMContentLoaded', function() {
+    if (!window.renderMainContent) {
+        var oldScript = document.querySelector('script[src="main-content.js"]');
+        if (oldScript) oldScript.remove();
+        var script = document.createElement('script');
+        script.src = 'main-content.js';
+        script.onload = function() {
+            if (window.renderMainContent) window.renderMainContent('.main-content');
+        };
+        document.body.appendChild(script);
+    } else {
+        window.renderMainContent('.main-content');
+    }
+});
 // --- Controle de abertura do chat ---
 window.chatIsOpen = false;
 document.addEventListener('DOMContentLoaded', function() {
