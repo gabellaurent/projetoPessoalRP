@@ -17,25 +17,29 @@
     `;
     document.head.appendChild(style);
   }
+
 // main-content.js
 // Renderiza postagens do Supabase no elemento passado
-const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
 let supabase;
 
+
 function renderMainContent(targetSelector = '#mainContentPosts') {
-  if (!window.supabase) {
-    // Carrega supabase-js se não existir
+  if (!window.supabaseClient) {
+    // Carrega supabaseClient.js se não existir
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js';
+    script.src = 'supabaseClient.js';
     script.onload = () => {
-      supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-      carregarPostagens(targetSelector);
+      window.supabaseClient.load(function(client) {
+        supabase = client;
+        carregarPostagens(targetSelector);
+      });
     };
     document.head.appendChild(script);
   } else {
-    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-    carregarPostagens(targetSelector);
+    window.supabaseClient.load(function(client) {
+      supabase = client;
+      carregarPostagens(targetSelector);
+    });
   }
 }
 
