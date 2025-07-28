@@ -62,6 +62,7 @@
   `;
 
   function mountChat() {
+    window.chatIsOpen = true;
     // Função para checar conexão com Supabase (apenas alerta real)
     async function checarConexao() {
       try {
@@ -178,6 +179,7 @@
         if (root && root.parentNode) {
           root.parentNode.removeChild(root);
         }
+        window.chatIsOpen = false;
       };
     }
 
@@ -268,4 +270,16 @@
   }
 
   loadSupabase(mountChat);
+  // Se o chat for removido manualmente, também seta flag para false
+  window.addEventListener('DOMContentLoaded', function() {
+    var root = document.getElementById('chat-root');
+    if (root) {
+      var observer = new MutationObserver(function() {
+        if (!root.querySelector('.chat-wrapper')) {
+          window.chatIsOpen = false;
+        }
+      });
+      observer.observe(root, { childList: true, subtree: true });
+    }
+  });
 })();

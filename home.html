@@ -49,6 +49,8 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Garante que a flag global está definida como fechado ao carregar a página
+    window.chatIsOpen = false;
     document.addEventListener('DOMContentLoaded', function() {
       var chatIcon = document.getElementById('chatIcon');
       var chatRoot = document.getElementById('chat-root');
@@ -136,9 +138,8 @@
         .channel('public:meu-chat')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'meu-chat' }, payload => {
           const newId = payload.new.id;
-          // Só conta se o chat NÃO estiver renderizado e visível E a mensagem não for do próprio usuário
-          let chatWrapper = chatRoot ? chatRoot.querySelector('.chat-wrapper') : null;
-          let isChatOpen = chatWrapper && getComputedStyle(chatRoot).display !== 'none';
+          // Só conta se o chat estiver realmente fechado (flag global) E a mensagem não for do próprio usuário
+          let isChatOpen = window.chatIsOpen === true;
           let username = localStorage.getItem('username') || '';
           let isOwnMessage = (payload.new.usuario && payload.new.usuario === username);
           if (!isChatOpen && !isOwnMessage) {
