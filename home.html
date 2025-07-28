@@ -15,7 +15,10 @@
         </div>
         <div class="navbar-icons">
             <span class="icon" id="bellIcon"><i class="fa-regular fa-bell"></i></span>
-            <span class="icon" id="chatIcon" title="Abrir Chat"><i class="fa-regular fa-comment"></i></span>
+            <span class="icon" id="chatIcon" title="Abrir Chat" style="position:relative;">
+              <i class="fa-regular fa-comment"></i>
+              <span id="chat-badge" style="display:none;position:absolute;top:-3px;right:-3px;background:#e74c3c;color:#fff;font-size:0.62em;font-weight:bold;padding:1px 4px;border-radius:8px;min-width:10px;text-align:center;z-index:2;pointer-events:none;box-shadow:0 1px 4px #0002;transform:scale(0.7);">0</span>
+            </span>
             <span class="icon" id="criarPostagemBtn" title="Criar Postagem" style="display:inline-flex;align-items:center;gap:6px;padding:0 10px;cursor:pointer;font-weight:600;color:#fff;font-size: 1.3rem;">
               <i class="fa-solid fa-plus"></i> <span style="font-size:1em;">Criar Postagem</span>
             </span>
@@ -40,17 +43,46 @@
     </div>
     <script src="chat-embed.js"></script>
     <script type="module" src="home.js"></script>
-    <script>
-    // Reabrir o chat ao clicar no ícone de chat
+    <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     document.addEventListener('DOMContentLoaded', function() {
       var chatIcon = document.getElementById('chatIcon');
       var chatRoot = document.getElementById('chat-root');
+      var chatBadge = document.getElementById('chat-badge');
       // Garante que o chat começa fechado
       if (chatRoot) {
         chatRoot.innerHTML = '';
         chatRoot.style.display = 'none';
       }
+      // Função para resetar badge ao abrir o chat
+      function resetChatBadge() {
+        if (chatBadge) {
+          chatBadge.style.display = 'none';
+          chatBadge.textContent = '0';
+        }
+        // Salva o último id da mensagem lida
+        supabase
+          .from('meu-chat')
+          .select('id')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .then(({ data }) => {
+            if (data && data.length > 0) {
+              localStorage.setItem('lastChatMsgId', data[0].id);
+            }
+          });
+      }
       chatIcon.addEventListener('click', function() {
+        // Zera badge imediatamente ao clicar, mesmo antes do chat renderizar
+        unreadCount = 0;
+        if (chatBadge) {
+          chatBadge.style.display = 'none';
+          chatBadge.textContent = '0';
+        }
         if (chatRoot && (chatRoot.innerHTML.trim() === '' || chatRoot.style.display === 'none')) {
           // Remove o script antigo se existir
           var oldScript = document.querySelector('script[src="chat-embed.js"]');
@@ -60,16 +92,15 @@
           script.src = 'chat-embed.js';
           document.body.appendChild(script);
           chatRoot.style.display = '';
+          resetChatBadge();
         }
       });
 
       // Botão Criar Postagem
       var criarBtn = document.getElementById('criarPostagemBtn');
       criarBtn.addEventListener('click', function() {
-        // Remove main-content.js se existir para evitar conflito
         var oldScript = document.querySelector('script[src="main-content.js"]');
         if (oldScript) oldScript.remove();
-        // Carrega criar-postagem.js se necessário
         if (!window.renderCriarPostagem) {
           var script = document.createElement('script');
           script.src = 'criar-postagem.js';
@@ -81,30 +112,50 @@
           window.renderCriarPostagem('.main-content');
         }
       });
-    });
-    </script>
-    <script>
-    // Reabrir o chat ao clicar no ícone de chat
-    document.addEventListener('DOMContentLoaded', function() {
-      var chatIcon = document.getElementById('chatIcon');
-      var chatRoot = document.getElementById('chat-root');
-      // Garante que o chat começa fechado
-      if (chatRoot) {
-        chatRoot.innerHTML = '';
-        chatRoot.style.display = 'none';
-      }
-      chatIcon.addEventListener('click', function() {
-        if (chatRoot && (chatRoot.innerHTML.trim() === '' || chatRoot.style.display === 'none')) {
-          // Remove o script antigo se existir
-          var oldScript = document.querySelector('script[src="chat-embed.js"]');
-          if (oldScript) oldScript.remove();
-          // Cria novo script
-          var script = document.createElement('script');
-          script.src = 'chat-embed.js';
-          document.body.appendChild(script);
-          chatRoot.style.display = '';
-        }
-      });
+
+      // Badge: escuta realtime do chat
+      let lastMsgId = localStorage.getItem('lastChatMsgId');
+      let unreadCount = 0;
+      // Busca o último id ao carregar
+      supabase
+        .from('meu-chat')
+        .select('id')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            if (!lastMsgId) {
+              localStorage.setItem('lastChatMsgId', data[0].id);
+              lastMsgId = data[0].id;
+            }
+          }
+        });
+      // Realtime: incrementa badge se nova mensagem
+         // Realtime: incrementa badge se nova mensagem
+      supabase
+        .channel('public:meu-chat')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'meu-chat' }, payload => {
+          const newId = payload.new.id;
+          // Só conta se o chat NÃO estiver renderizado e visível E a mensagem não for do próprio usuário
+          let chatWrapper = chatRoot ? chatRoot.querySelector('.chat-wrapper') : null;
+          let isChatOpen = chatWrapper && getComputedStyle(chatRoot).display !== 'none';
+          let username = localStorage.getItem('username') || '';
+          let isOwnMessage = (payload.new.usuario && payload.new.usuario === username);
+          if (!isChatOpen && !isOwnMessage) {
+            if (!lastMsgId) lastMsgId = newId;
+            if (newId !== lastMsgId) {
+              unreadCount++;
+              chatBadge.textContent = unreadCount > 99 ? '99+' : '+' + unreadCount;
+              chatBadge.style.display = 'inline-block';
+            }
+          } else {
+            // Se o chat está aberto ou a mensagem é do próprio usuário, reseta
+            resetChatBadge();
+            unreadCount = 0;
+            lastMsgId = newId;
+          }
+        })
+        .subscribe();
     });
     </script>
 </body>
