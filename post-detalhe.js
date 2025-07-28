@@ -13,21 +13,23 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
     return;
   }
 
-  // Supabase config
-  const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
+  // Usa configuração centralizada do Supabase
   let supabase;
-  if (!window.supabase) {
+  if (!window.supabaseClient) {
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js';
-    script.onload = () => {
-      supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-      buscarPostagem(uuid);
+    script.src = 'supabaseClient.js';
+    script.onload = function() {
+      window.supabaseClient.load(function(client) {
+        supabase = client;
+        buscarPostagem(uuid);
+      });
     };
     document.head.appendChild(script);
   } else {
-    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-    buscarPostagem(uuid);
+    window.supabaseClient.load(function(client) {
+      supabase = client;
+      buscarPostagem(uuid);
+    });
   }
 
   async function buscarPostagem(postId) {
