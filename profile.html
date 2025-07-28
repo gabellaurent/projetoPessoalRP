@@ -1,0 +1,219 @@
+<!-- profile.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Perfil do Usuário</title>
+  <link rel="stylesheet" href="home.css">
+  <style>
+    body { background: #18191c; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; }
+    .profile-container { max-width: 600px; margin: 40px auto; background: #23272a; border-radius: 12px; padding: 32px 28px; box-shadow: 0 2px 16px #0002; }
+    .profile-header { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+    .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: #444; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2.5rem; font-weight: bold; }
+    .profile-info { flex: 1; }
+    .profile-username { font-size: 1.7rem; font-weight: 700; color: #00b0f4; }
+    .profile-email { color: #aaa; font-size: 1.05rem; }
+    .profile-bio { color: #dcddde; font-size: 1.1rem; margin: 10px 0 0 0; }
+    .profile-meta { margin-top: 10px; color: #ccc; font-size: 1.05rem; }
+    .search-bar { display: flex; gap: 10px; margin-bottom: 28px; }
+    .search-bar input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: #fff; }
+    .search-bar button { background: #00b0f4; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-weight: 600; cursor: pointer; }
+    .not-found { color: #e74c3c; text-align: center; margin-top: 24px; }
+    .tabs { display: flex; gap: 0; border-bottom: 2px solid #222; margin-top: 24px; }
+    .tab-btn { flex: 1; background: none; border: none; color: #aaa; font-size: 1.1rem; padding: 12px 0; cursor: pointer; font-weight: 600; border-bottom: 2px solid transparent; transition: color 0.2s, border 0.2s; }
+    .tab-btn.active { color: #00b0f4; border-bottom: 2.5px solid #00b0f4; }
+    .tab-content { margin-top: 18px; }
+    .post, .comment { background: #222; border-radius: 8px; padding: 14px 18px; margin-bottom: 14px; }
+    .post-title { color: #00b0f4; font-size: 1.15rem; font-weight: 600; margin-bottom: 6px; }
+    .post-date, .comment-date { color: #aaa; font-size: 0.98rem; margin-bottom: 4px; }
+    .post-content, .comment-content { color: #dcddde; font-size: 1.05rem; }
+    .comment-post-title { color: #00b0f4; font-size: 1rem; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <div class="search-bar">
+      <input id="usernameInput" type="text" placeholder="Digite o nome do usuário...">
+      <button id="buscarUsuarioBtn">Buscar</button>
+    </div>
+    <div id="profileContent"></div>
+  </div>
+  <script src="supabaseClient.js"></script>
+  <script>
+    let usuarioAtual = null;
+    let postsUsuario = [];
+    let comentariosUsuario = [];
+
+    function renderProfile(usuario) {
+      if (!usuario) {
+        document.getElementById('profileContent').innerHTML = '<div class="not-found">Usuário não encontrado.</div>';
+        usuarioAtual = null;
+        return;
+      }
+      usuarioAtual = usuario;
+      document.getElementById('profileContent').innerHTML = `
+        <div class="profile-header">
+          <div class="profile-avatar">${usuario.username ? usuario.username[0].toUpperCase() : '?'}</div>
+          <div class="profile-info">
+            <div class="profile-username">${usuario.username || 'Usuário'}</div>
+            <div class="profile-email">${usuario.email || ''}</div>
+            <div class="profile-bio">${usuario.bio ? usuario.bio : '<span style="color:#888;">Sem bio cadastrada.</span>'}</div>
+          </div>
+        </div>
+        <div class="profile-meta">
+          <div><b>ID:</b> ${usuario.id}</div>
+          <div><b>Registrado em:</b> ${usuario.created_at ? new Date(usuario.created_at).toLocaleString('pt-BR') : '-'}</div>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" id="tabPosts">Postagens</button>
+          <button class="tab-btn" id="tabComentarios">Comentários</button>
+        </div>
+        <div class="tab-content" id="tabContent"></div>
+      `;
+      carregarPostsEComentarios(usuario.id);
+      ativarTabs();
+    }
+
+    function ativarTabs() {
+      const tabPosts = document.getElementById('tabPosts');
+      const tabComentarios = document.getElementById('tabComentarios');
+      const tabContent = document.getElementById('tabContent');
+      if (!tabPosts || !tabComentarios || !tabContent) return;
+      tabPosts.onclick = function() {
+        tabPosts.classList.add('active');
+        tabComentarios.classList.remove('active');
+        renderPostsTab();
+      };
+      tabComentarios.onclick = function() {
+        tabComentarios.classList.add('active');
+        tabPosts.classList.remove('active');
+        renderComentariosTab();
+      };
+      renderPostsTab();
+    }
+
+    function renderPostsTab() {
+      const tabContent = document.getElementById('tabContent');
+      if (!tabContent) return;
+      if (!postsUsuario.length) {
+        tabContent.innerHTML = '<div style="color:#aaa;text-align:center;">Nenhuma postagem encontrada.</div>';
+        return;
+      }
+      tabContent.innerHTML = postsUsuario.map(post => `
+        <a href="#" class="post-title" style="display:block;margin-bottom:10px;text-decoration:none;cursor:pointer;" data-post-id="${post.id}">${post.titulo || '(Sem título)'}</a>
+      `).join('');
+      // Adiciona evento para cada link
+      Array.from(tabContent.querySelectorAll('.post-title')).forEach(link => {
+        link.onclick = function(e) {
+          e.preventDefault();
+          const postId = this.getAttribute('data-post-id');
+          if (window.renderPostDetalhe) {
+            window.renderPostDetalhe(postId, '.main-content');
+          } else {
+            // Carrega o script se não estiver carregado
+            var script = document.createElement('script');
+            script.src = 'post-detalhe.js';
+            script.onload = function() {
+              window.renderPostDetalhe(postId, '.main-content');
+            };
+            document.body.appendChild(script);
+          }
+        };
+      });
+    }
+
+    function renderComentariosTab() {
+      const tabContent = document.getElementById('tabContent');
+      if (!tabContent) return;
+      if (!comentariosUsuario.length) {
+        tabContent.innerHTML = '<div style="color:#aaa;text-align:center;">Nenhum comentário encontrado.</div>';
+        return;
+      }
+      tabContent.innerHTML = comentariosUsuario.map(com => `
+        <div class="comment">
+          <div class="comment-date">${new Date(com.created_at).toLocaleString('pt-BR')}</div>
+          <div class="comment-content">${com.conteudo ? com.conteudo.replace(/\n/g, '<br>') : ''}</div>
+          <div class="comment-post-title">Em: ${com.titulo_post || '(Postagem desconhecida)'}</div>
+        </div>
+      `).join('');
+    }
+
+function carregarPostsEComentarios(usuarioId) {
+  postsUsuario = [];
+  comentariosUsuario = [];
+  // Busca posts pelo nome do usuário (coluna 'usuario' na tabela posts)
+  const username = usuarioAtual && usuarioAtual.username ? usuarioAtual.username : null;
+  if (!username) {
+    postsUsuario = [];
+    renderPostsTab();
+    comentariosUsuario = [];
+    renderComentariosTab();
+    return;
+  }
+  window.supabaseClient.load(async function(supabase) {
+    const { data: posts } = await supabase
+      .from('posts')
+      .select('id, titulo, created_at')
+      .eq('usuario', username)
+      .order('created_at', { ascending: false });
+    postsUsuario = posts || [];
+    renderPostsTab();
+  });
+  // Busca comentários e títulos dos posts comentados
+  window.supabaseClient.load(async function(supabase) {
+    const { data: comentarios } = await supabase
+      .from('comments')
+      .select('conteudo, created_at, post_id')
+      .eq('usuario_id', usuarioId)
+      .order('created_at', { ascending: false });
+    if (comentarios && comentarios.length) {
+      // Buscar títulos dos posts comentados
+      const postIds = comentarios.map(c => c.post_id);
+      const { data: postsComentados } = await supabase
+        .from('posts')
+        .select('id, titulo')
+        .in('id', postIds);
+      const idToTitulo = {};
+      if (postsComentados) postsComentados.forEach(p => { idToTitulo[p.id] = p.titulo; });
+      comentariosUsuario = comentarios.map(c => ({ ...c, titulo_post: idToTitulo[c.post_id] }));
+    } else {
+      comentariosUsuario = [];
+    }
+    // Só renderiza se a aba comentários estiver ativa
+    const tabComentarios = document.getElementById('tabComentarios');
+    if (tabComentarios && tabComentarios.classList.contains('active')) {
+      renderComentariosTab();
+    }
+  });
+}
+
+    function buscarUsuarioPorNome(username) {
+      document.getElementById('profileContent').innerHTML = '<div style="color:#aaa;text-align:center;">Buscando...</div>';
+      window.supabaseClient.load(async function(supabase) {
+        const { data, error } = await supabase
+          .from('base-users')
+          .select('*')
+          .ilike('username', username)
+          .limit(1)
+          .single();
+        if (error || !data) {
+          renderProfile(null);
+        } else {
+          renderProfile(data);
+        }
+      });
+    }
+
+    document.getElementById('buscarUsuarioBtn').onclick = function() {
+      const username = document.getElementById('usernameInput').value.trim();
+      if (username) buscarUsuarioPorNome(username);
+    };
+    document.getElementById('usernameInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const username = this.value.trim();
+        if (username) buscarUsuarioPorNome(username);
+      }
+    });
+  </script>
+</body>
+</html>

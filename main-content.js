@@ -140,7 +140,7 @@ async function carregarPostagens(targetSelector) {
         <div class="reddit-post" data-id="${post.id}">
           <div class="reddit-header">
             <div class="reddit-avatar">${post.usuario ? post.usuario[0].toUpperCase() : 'A'}</div>
-            <span class="reddit-username">${post.usuario || 'anon_user'}</span>
+            <a href="#" class="reddit-username-link reddit-username" data-username="${post.usuario || ''}" style="color:#00b0f4;font-weight:600;font-size:1rem;text-decoration:underline;cursor:pointer;">${post.usuario || 'anon_user'}</a>
             <span class="reddit-time">${new Date(post.created_at).toLocaleString('pt-BR')}</span>
           </div>
           <div class="reddit-title" data-click="titulo" style="cursor:pointer;">${post.titulo || ''}</div>
@@ -182,6 +182,32 @@ async function carregarPostagens(targetSelector) {
           }
         }
         e.stopPropagation();
+      });
+    });
+
+    // Adiciona event listener para username
+    target.querySelectorAll('.reddit-username-link').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const username = this.getAttribute('data-username');
+        // Limpa a área main-content
+        const mainContentArea = document.querySelector('.main-content');
+        if (mainContentArea) {
+          while (mainContentArea.firstChild) {
+            mainContentArea.removeChild(mainContentArea.firstChild);
+          }
+        }
+        // Carrega profile.js se necessário
+        if (!window.renderProfilePage) {
+          var script = document.createElement('script');
+          script.src = 'profile.js';
+          script.onload = function() {
+            window.renderProfilePage(username, '.main-content');
+          };
+          document.body.appendChild(script);
+        } else {
+          window.renderProfilePage(username, '.main-content');
+        }
       });
     });
     addLoadMoreButton();
