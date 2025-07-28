@@ -177,7 +177,7 @@
         (async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user && user.id) {
-                window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP/home.html';
+                window.location.href = 'https://gabellaurent.github.io/socialproject/home.html';
                 return;
             }
         })();
@@ -377,7 +377,7 @@
                 btn.disabled = false;
                 btn.innerHTML = 'Entrar';
                 loginForm.reset();
-                window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP/home.html';
+                window.location.href = 'https://gabellaurent.github.io/socialproject/home.html';
             }, 1200);
         });
     </script>
