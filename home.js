@@ -54,34 +54,18 @@ const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function ensureUsername() {
-    let username = localStorage.getItem("username");
-    if (!username || username.trim() === "") {
-        // Tenta obter usuário autenticado
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user && user.id) {
-            // Busca username na base-users
-            const { data, error } = await supabase
-                .from('base-users')
-                .select('username')
-                .eq('id', user.id)
-                .single();
-            if (data && data.username) {
-                localStorage.setItem('username', data.username);
-                // Recarrega para seguir o fluxo normal
-                window.location.reload();
-                return;
-            }
-        }
-        // Se não conseguir, redireciona para login
+
+// Exibe o body após garantir que o usuário está autenticado
+async function garantirUsuarioAutenticado() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || !user.id) {
         window.location.href = "https://gabellaurent.github.io/socialproject";
         return;
     }
-    // Exibe o body após validação
     document.body.style.display = '';
 }
 
-await ensureUsername();
+await garantirUsuarioAutenticado();
 
 // Exibe/oculta o painel de perfil ao clicar no ícone de usuário
 const userIcon = document.getElementById('userIcon');
@@ -89,21 +73,28 @@ const profilePanel = document.getElementById('profilePanel');
 const bellIcon = document.getElementById('bellIcon');
 const notificationPanel = document.getElementById('notificationPanel');
 
-// Busca o username diretamente da tabela base-users usando o id do usuário autenticado
+
+// Busca o username SEMPRE pelo id do usuário autenticado (ignora localStorage)
 async function exibirNomeUsuarioProfile() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user && user.id) {
-        const { data, error } = await supabase
-            .from('base-users')
-            .select('username')
-            .eq('id', user.id)
-            .single();
-        if (data && data.username) {
-            document.getElementById("profile-username").textContent = data.username;
-            return;
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && user.id) {
+            const { data, error } = await supabase
+                .from('base-users')
+                .select('username')
+                .eq('id', user.id)
+                .single();
+            if (data && data.username) {
+                document.getElementById("profile-username").textContent = data.username;
+                // Atualiza localStorage para manter sincronizado
+                localStorage.setItem('username', data.username);
+                return;
+            }
         }
+        document.getElementById("profile-username").textContent = "Usuário";
+    } catch (e) {
+        document.getElementById("profile-username").textContent = "Usuário";
     }
-    document.getElementById("profile-username").textContent = "Usuário";
 }
 exibirNomeUsuarioProfile();
 
