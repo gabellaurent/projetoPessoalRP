@@ -77,15 +77,23 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
     const voltarBtn = document.getElementById('voltarMainContent');
     if (voltarBtn) {
       voltarBtn.onclick = function() {
-        if (!window.renderMainContent) {
-          var script = document.createElement('script');
-          script.src = 'main-content.js';
-          script.onload = function() {
-            window.renderMainContent('.main-content');
-          };
-          document.body.appendChild(script);
+        // Se estiver dentro do modal, apenas fecha o modal
+        const modal = document.getElementById('post-detalhe-modal');
+        if (modal && modal.style.display === 'flex') {
+          modal.style.display = 'none';
+          modal.innerHTML = '';
         } else {
-          window.renderMainContent('.main-content');
+          // Se não estiver no modal, recarrega main-content
+          if (!window.renderMainContent) {
+            var script = document.createElement('script');
+            script.src = 'main-content.js';
+            script.onload = function() {
+              window.renderMainContent('.main-content');
+            };
+            document.body.appendChild(script);
+          } else {
+            window.renderMainContent('.main-content');
+          }
         }
       };
     }

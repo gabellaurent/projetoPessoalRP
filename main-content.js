@@ -173,8 +173,7 @@ async function carregarPostagens(targetSelector) {
     });
     // Adiciona event listener para a postagem inteira
     target.querySelectorAll('.reddit-post').forEach(function(postEl) {
-      postEl.addEventListener('click', function(e) {
-        // Ignora cliques em botões de ação, links, ou elementos interativos
+      postEl.addEventListener('click', async function(e) {
         if (
           e.target.closest('.reddit-action') ||
           e.target.tagName === 'A' ||
@@ -184,23 +183,38 @@ async function carregarPostagens(targetSelector) {
         }
         const postId = postEl.getAttribute('data-id');
         localStorage.setItem('post_uuid_clicked', postId);
-        // Limpa a área main-content
-        const mainContentArea = document.querySelector('.main-content');
-        if (mainContentArea) {
-          while (mainContentArea.firstChild) {
-            mainContentArea.removeChild(mainContentArea.firstChild);
+        // Renderiza o post-detalhe no modal, sem apagar main-content
+        const modal = document.getElementById('post-detalhe-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.innerHTML = '<div id="modal-content" style="background:#23272a;border-radius:12px;max-width:600px;width:96vw;padding:32px 32px 24px 32px;box-shadow:0 8px 32px #0008;position:relative;"></div>';
+          // Carrega post-detalhe.js se necessário
+          if (!window.renderPostDetalhe) {
+            var script = document.createElement('script');
+            script.src = 'post-detalhe.js';
+            script.onload = function() {
+              window.renderPostDetalhe(postId, '#modal-content');
+              addModalCloseBtn();
+            };
+            document.body.appendChild(script);
+          } else {
+            window.renderPostDetalhe(postId, '#modal-content');
+            addModalCloseBtn();
           }
         }
-        // Carrega post-detalhe.js se necessário
-        if (!window.renderPostDetalhe) {
-          var script = document.createElement('script');
-          script.src = 'post-detalhe.js';
-          script.onload = function() {
-            window.renderPostDetalhe(postId, '.main-content');
-          };
-          document.body.appendChild(script);
-        } else {
-          window.renderPostDetalhe(postId, '.main-content');
+        function addModalCloseBtn() {
+          const modalContent = document.getElementById('modal-content');
+          if (modalContent && !document.getElementById('closeModalBtn')) {
+            const btn = document.createElement('button');
+            btn.id = 'closeModalBtn';
+            btn.textContent = 'Fechar';
+            btn.style = 'position:absolute;top:18px;right:18px;background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-weight:600;cursor:pointer;z-index:2;';
+            btn.onclick = function() {
+              const modal = document.getElementById('post-detalhe-modal');
+              if (modal) modal.style.display = 'none';
+            };
+            modalContent.appendChild(btn);
+          }
         }
         e.stopPropagation();
       });
