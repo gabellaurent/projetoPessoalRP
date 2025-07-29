@@ -69,7 +69,7 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
       .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:100%;margin:10px 0;border-radius:8px;">');
     target.innerHTML = `
       <div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#23272f;box-sizing:border-box;margin:0;padding:0;border-radius:0;">
-        <div style="width:50%;max-width:50%;min-width:320px;background:#23272f;box-sizing:border-box;margin:32px auto 32px auto;padding:0 24px 0 0;border-radius:0;min-height:90vh;max-height:90vh;overflow:auto;">
+        <div style="width:50%;max-width:50%;min-width:320px;background:#23272f;box-sizing:border-box;margin:32px auto 32px auto;padding:0 24px 0 0;border-radius:0;min-height:90vh;max-height:90vh;overflow:auto;scrollbar-width:none;-ms-overflow-style:none;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;justify-content:space-between;">
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:38px;height:38px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>

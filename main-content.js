@@ -3,8 +3,21 @@
     const style = document.createElement('style');
     style.id = 'main-content-style';
     style.textContent = `
-      #mainContentPosts, .main-content {  }
-      .reddit-post { padding: 22px 28px 10px 28px; border-bottom: 1px solid #333; }
+      #mainContentPosts, .main-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        
+      }
+      .reddit-post {
+        padding: 22px 28px 10px 28px;
+        border-bottom: 1px solid #333;
+        width: 100%;
+        max-width: 900px;
+        box-sizing: border-box;
+        margin: 0 auto;
+      }
       .reddit-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
       .reddit-avatar { width: 38px; height: 38px; border-radius: 50%; background: #444; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 1.2rem; }
       .reddit-username { color: #00b0f4; font-weight: 600; font-size: 1rem; }
