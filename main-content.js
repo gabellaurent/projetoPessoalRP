@@ -125,15 +125,29 @@ async function carregarPostagens(targetSelector) {
 
   function renderPosts() {
     const username = localStorage.getItem('username');
-    target.innerHTML = posts.map(post => {
+    // Adiciona CSS da animação se não existir
+    if (!document.getElementById('fadein-main-content-style')) {
+      const style = document.createElement('style');
+      style.id = 'fadein-main-content-style';
+      style.textContent = `
+        .fadein-post-main {
+          opacity: 0;
+          transition: opacity 0.7s ease;
+        }
+        .fadein-post-main.visible {
+          opacity: 1;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    // Renderiza dentro do container animado
+    target.innerHTML = `<div class="fadein-post-main" id="fadeinMainContentContainer">${posts.map(post => {
       const isOwner = username && post.usuario === username;
-      // Formatação: quebra de linha, negrito e itálico
       let conteudoFormatado = post.conteudo || '';
       conteudoFormatado = conteudoFormatado
         .replace(/\n/g, '<br>')
         .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
         .replace(/\*(.*?)\*/g, '<i>$1</i>')
-        // Detecta links de imagens e renderiza como <img> com tamanho reduzido
         .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:320px;max-height:220px;margin:10px 0;border-radius:8px;object-fit:cover;">');
       const comentariosCount = comentariosPorPost[post.id] ?? 0;
       return `
@@ -153,20 +167,59 @@ async function carregarPostagens(targetSelector) {
           </div>
         </div>
       `;
-    }).join('');
+    }).join('')}</div>`;
+    // Aplica fade-in
+    setTimeout(() => {
+      const fadein = document.getElementById('fadeinMainContentContainer');
+      if (fadein) fadein.classList.add('visible');
 
-    // Adiciona event listener para título e corpo
-    target.querySelectorAll('.reddit-title, .reddit-content').forEach(function(el) {
-      el.addEventListener('click', function(e) {
-        const postDiv = el.closest('.reddit-post');
-        if (postDiv) {
-          const postId = postDiv.getAttribute('data-id');
+      // Adiciona event listener para título e corpo dentro do container animado
+      fadein.querySelectorAll('.reddit-title, .reddit-content').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+          const postDiv = el.closest('.reddit-post');
+          if (postDiv) {
+            const postId = postDiv.getAttribute('data-id');
+            localStorage.setItem('post_uuid_clicked', postId);
+            // Agora sempre abre o modal, igual ao clique na postagem inteira
+            const modal = document.getElementById('post-detalhe-modal');
+            if (modal) {
+              modal.style.display = 'flex';
+              modal.innerHTML = '<div id="modal-content" style="background:#23272a;box-sizing:border-box;width:100%;height:100%;overflow:auto;position:relative;"></div>';
+              if (!window.renderPostDetalhe) {
+                var script = document.createElement('script');
+                script.src = 'post-detalhe.js';
+                script.onload = function() {
+                  window.renderPostDetalhe(postId, '#modal-content');
+                  addModalCloseBtn();
+                };
+                document.body.appendChild(script);
+              } else {
+                window.renderPostDetalhe(postId, '#modal-content');
+                addModalCloseBtn();
+              }
+            }
+          }
+          e.stopPropagation();
+        });
+      });
+      // Adiciona event listener para a postagem inteira dentro do container animado
+      fadein.querySelectorAll('.reddit-post').forEach(function(postEl) {
+        postEl.addEventListener('click', async function(e) {
+          if (
+            e.target.closest('.reddit-action') ||
+            e.target.tagName === 'A' ||
+            e.target.tagName === 'BUTTON'
+          ) {
+            return;
+          }
+          const postId = postEl.getAttribute('data-id');
           localStorage.setItem('post_uuid_clicked', postId);
-          // Agora sempre abre o modal, igual ao clique na postagem inteira
+          // Renderiza o post-detalhe no modal, sem apagar main-content
           const modal = document.getElementById('post-detalhe-modal');
           if (modal) {
             modal.style.display = 'flex';
             modal.innerHTML = '<div id="modal-content" style="background:#23272a;box-sizing:border-box;width:100%;height:100%;overflow:auto;position:relative;"></div>';
+            // Carrega post-detalhe.js se necessário
             if (!window.renderPostDetalhe) {
               var script = document.createElement('script');
               script.src = 'post-detalhe.js';
@@ -180,48 +233,13 @@ async function carregarPostagens(targetSelector) {
               addModalCloseBtn();
             }
           }
-
-        }
-        e.stopPropagation();
-      });
-    });
-    // Adiciona event listener para a postagem inteira
-    target.querySelectorAll('.reddit-post').forEach(function(postEl) {
-      postEl.addEventListener('click', async function(e) {
-        if (
-          e.target.closest('.reddit-action') ||
-          e.target.tagName === 'A' ||
-          e.target.tagName === 'BUTTON'
-        ) {
-          return;
-        }
-        const postId = postEl.getAttribute('data-id');
-        localStorage.setItem('post_uuid_clicked', postId);
-        // Renderiza o post-detalhe no modal, sem apagar main-content
-        const modal = document.getElementById('post-detalhe-modal');
-        if (modal) {
-          modal.style.display = 'flex';
-          modal.innerHTML = '<div id="modal-content" style="background:#23272a;box-sizing:border-box;width:100%;height:100%;overflow:auto;position:relative;"></div>';
-          // Carrega post-detalhe.js se necessário
-          if (!window.renderPostDetalhe) {
-            var script = document.createElement('script');
-            script.src = 'post-detalhe.js';
-            script.onload = function() {
-              window.renderPostDetalhe(postId, '#modal-content');
-              addModalCloseBtn();
-            };
-            document.body.appendChild(script);
-          } else {
-            window.renderPostDetalhe(postId, '#modal-content');
-            addModalCloseBtn();
+          function addModalCloseBtn() {
+            const modalContent = document.getElementById('modal-content');
           }
-        }
-        function addModalCloseBtn() {
-          const modalContent = document.getElementById('modal-content');
-        }
-        e.stopPropagation();
+          e.stopPropagation();
+        });
       });
-    });
+    }, 50);
     addLoadMoreButton();
     // Chama o script de vídeo após renderizar as postagens
     if (window.renderizarVideosYoutube) {
