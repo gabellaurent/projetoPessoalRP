@@ -171,6 +171,40 @@ async function carregarPostagens(targetSelector) {
         e.stopPropagation();
       });
     });
+    // Adiciona event listener para a postagem inteira
+    target.querySelectorAll('.reddit-post').forEach(function(postEl) {
+      postEl.addEventListener('click', function(e) {
+        // Ignora cliques em botões de ação, links, ou elementos interativos
+        if (
+          e.target.closest('.reddit-action') ||
+          e.target.tagName === 'A' ||
+          e.target.tagName === 'BUTTON'
+        ) {
+          return;
+        }
+        const postId = postEl.getAttribute('data-id');
+        localStorage.setItem('post_uuid_clicked', postId);
+        // Limpa a área main-content
+        const mainContentArea = document.querySelector('.main-content');
+        if (mainContentArea) {
+          while (mainContentArea.firstChild) {
+            mainContentArea.removeChild(mainContentArea.firstChild);
+          }
+        }
+        // Carrega post-detalhe.js se necessário
+        if (!window.renderPostDetalhe) {
+          var script = document.createElement('script');
+          script.src = 'post-detalhe.js';
+          script.onload = function() {
+            window.renderPostDetalhe(postId, '.main-content');
+          };
+          document.body.appendChild(script);
+        } else {
+          window.renderPostDetalhe(postId, '.main-content');
+        }
+        e.stopPropagation();
+      });
+    });
     addLoadMoreButton();
     // Chama o script de vídeo após renderizar as postagens
     if (window.renderizarVideosYoutube) {

@@ -17,7 +17,7 @@ function renderizarVideosYoutube(postContainerSelector = '.main-content') {
             if (match) {
                 const videoId = match[2] || match[3];
                 if (videoId) {
-                    el.outerHTML = `<div class=\"yt-video-embed\" style=\"margin:10px 0;max-width:560px;\"><div style=\"position:relative;width:100%;padding-bottom:56.25%;height:0;\"><iframe style=\"position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;\" src=\"https://www.youtube.com/embed/${videoId}\" frameborder=\"0\" allowfullscreen></iframe></div></div>`;
+                    el.outerHTML = `<div class=\"yt-video-embed\" style=\"margin:10px 0;max-width:560px;\"><div style=\"position:relative;width:100%;padding-bottom:56.25%;height:0;\"><iframe style=\"position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;pointer-events:none;\" src=\"https://www.youtube.com/embed/${videoId}\" frameborder=\"0\" allowfullscreen></iframe></div></div>`;
                 }
             }
         } else {
@@ -26,7 +26,7 @@ function renderizarVideosYoutube(postContainerSelector = '.main-content') {
             let newHtml = html.replace(ytRegex, function(match, url1, id1, id2) {
                 const videoId = id1 || id2;
                 if (videoId) {
-                    return `<div class=\"yt-video-embed\" style=\"margin:10px 0;max-width:560px;\"><div style=\"position:relative;width:100%;padding-bottom:56.25%;height:0;\"><iframe style=\"position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;\" src=\"https://www.youtube.com/embed/${videoId}\" frameborder=\"0\" allowfullscreen></iframe></div></div>`;
+                    return `<div class=\"yt-video-embed\" style=\"margin:10px 0;max-width:560px;\"><div style=\"position:relative;width:100%;padding-bottom:56.25%;height:0;\"><iframe style=\"position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;pointer-events:none;\" src=\"https://www.youtube.com/embed/${videoId}\" frameborder=\"0\" allowfullscreen></iframe></div></div>`;
                 }
                 return match;
             });
