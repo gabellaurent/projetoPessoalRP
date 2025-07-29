@@ -73,6 +73,10 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
             </div>
           </div>
         `;
+        // Garante que o embed do vídeo seja processado
+        if (window.renderizarVideosYoutube) {
+          window.renderizarVideosYoutube(targetSelector);
+        }
     // Botão voltar para main-content
     const voltarBtn = document.getElementById('voltarMainContent');
     if (voltarBtn) {
