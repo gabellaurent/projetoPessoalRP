@@ -153,7 +153,7 @@ async function carregarPostagens(targetSelector) {
           const modal = document.getElementById('post-detalhe-modal');
           if (modal) {
             modal.style.display = 'flex';
-            modal.innerHTML = '<div id="modal-content" style="background:#23272a;border-radius:12px;max-width:600px;width:96vw;padding:32px 32px 24px 32px;box-shadow:0 8px 32px #0008;position:relative;"></div>';
+            modal.innerHTML = '<div id="modal-content" style="background:#23272a;box-sizing:border-box;width:100%;height:100%;overflow:auto;position:relative;"></div>';
             if (!window.renderPostDetalhe) {
               var script = document.createElement('script');
               script.src = 'post-detalhe.js';
@@ -167,20 +167,7 @@ async function carregarPostagens(targetSelector) {
               addModalCloseBtn();
             }
           }
-          function addModalCloseBtn() {
-            const modalContent = document.getElementById('modal-content');
-            if (modalContent && !document.getElementById('closeModalBtn')) {
-              const btn = document.createElement('button');
-              btn.id = 'closeModalBtn';
-              btn.textContent = 'Fechar';
-              btn.style = 'position:absolute;top:18px;right:18px;background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-weight:600;cursor:pointer;z-index:2;';
-              btn.onclick = function() {
-                const modal = document.getElementById('post-detalhe-modal');
-                if (modal) modal.style.display = 'none';
-              };
-              modalContent.appendChild(btn);
-            }
-          }
+
         }
         e.stopPropagation();
       });
@@ -201,7 +188,7 @@ async function carregarPostagens(targetSelector) {
         const modal = document.getElementById('post-detalhe-modal');
         if (modal) {
           modal.style.display = 'flex';
-          modal.innerHTML = '<div id="modal-content" style="background:#23272a;border-radius:12px;max-width:600px;width:96vw;padding:32px 32px 24px 32px;box-shadow:0 8px 32px #0008;position:relative;"></div>';
+          modal.innerHTML = '<div id="modal-content" style="background:#23272a;box-sizing:border-box;width:100%;height:100%;overflow:auto;position:relative;"></div>';
           // Carrega post-detalhe.js se necessário
           if (!window.renderPostDetalhe) {
             var script = document.createElement('script');
@@ -218,17 +205,6 @@ async function carregarPostagens(targetSelector) {
         }
         function addModalCloseBtn() {
           const modalContent = document.getElementById('modal-content');
-          if (modalContent && !document.getElementById('closeModalBtn')) {
-            const btn = document.createElement('button');
-            btn.id = 'closeModalBtn';
-            btn.textContent = 'Fechar';
-            btn.style = 'position:absolute;top:18px;right:18px;background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-weight:600;cursor:pointer;z-index:2;';
-            btn.onclick = function() {
-              const modal = document.getElementById('post-detalhe-modal');
-              if (modal) modal.style.display = 'none';
-            };
-            modalContent.appendChild(btn);
-          }
         }
         e.stopPropagation();
       });
