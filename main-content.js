@@ -172,6 +172,10 @@ async function carregarPostagens(targetSelector) {
       });
     });
     addLoadMoreButton();
+    // Chama o script de vídeo após renderizar as postagens
+    if (window.renderizarVideosYoutube) {
+      window.renderizarVideosYoutube(targetSelector);
+    }
   }
 
   // Inicializa carregamento
