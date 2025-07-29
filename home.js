@@ -66,29 +66,22 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
   chatIcon.addEventListener('click', function() {
-    // Só cria o chat se ele não estiver aberto
-    if (window.chatIsOpen === true) {
-      // Se o chat-root estiver oculto, mostra
-      if (chatRoot && chatRoot.style.display === 'none') {
-        chatRoot.style.display = '';
-        // Não recarrega mensagens, só mostra o chat já existente
-      }
-      // Zera badge
-      resetChatBadge();
-      return;
-    }
-    // Zera badge imediatamente ao clicar, mesmo antes do chat renderizar
-    resetChatBadge();
-    if (chatRoot && (chatRoot.innerHTML.trim() === '' || chatRoot.style.display === 'none')) {
-      // Remove o script antigo se existir
+    var chatRoot = document.getElementById('chat-root');
+    // Se não existe ou foi removido, recarrega o script
+    if (!chatRoot || !document.body.contains(chatRoot)) {
       var oldScript = document.querySelector('script[src="chat-embed.js"]');
       if (oldScript) oldScript.remove();
-      // Cria novo script
       var script = document.createElement('script');
       script.src = 'chat-embed.js';
       document.body.appendChild(script);
-      chatRoot.style.display = '';
+      return;
     }
+    // Se existe mas está oculto, mostra
+    if (chatRoot.style.display === 'none') {
+      chatRoot.style.display = '';
+      return;
+    }
+    // Se já está aberto, não faz nada
   });
 });
 
