@@ -43,36 +43,50 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
       target.innerHTML = `<p style='color:#e74c3c;text-align:center;'>Postagem não encontrada.</p>`;
       return;
     }
-    // Formata o conteúdo para exibir quebra de linha, negrito, itálico e imagens
+    // Formata o conteúdo para exibir quebra de linha, negrito, itálico, imagens e vídeos do YouTube
     let conteudoFormatado = data.conteudo || '';
     conteudoFormatado = conteudoFormatado
-      .replace(/\n/g, '<br>')
-      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-      .replace(/\*(.*?)\*/g, '<i>$1</i>')
-      // Detecta links de imagens e renderiza como <img>
-      .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:100%;margin:10px 0;border-radius:8px;">');
-        target.innerHTML = `
-          <div style="max-width:600px;margin:40px auto;border-radius:12px;padding:32px 32px 24px 32px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;justify-content:space-between;">
-              <div style="display:flex;align-items:center;gap:10px;">
-                <div style="width:38px;height:38px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
-                <span style="color:#00b0f4;font-weight:600;font-size:1rem;">${data.usuario || 'anon_user'}</span>
-                <span style="color:#aaa;font-size:0.95rem;margin-left:8px;">${new Date(data.created_at).toLocaleString('pt-BR')}</span>
-              </div>
-              <button id="voltarMainContent" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-weight:600;cursor:pointer;">Voltar</button>
-            </div>
-            <div style="color:#fff;font-size:1.35rem;font-weight:700;margin-bottom:10px;">${data.titulo || ''}</div>
-            <div style="color:#dcddde;font-size:1.1rem;margin-bottom:18px;">${conteudoFormatado}</div>
-            <div id="comentarios-section" style="margin-top:32px;">
-              <h3 style="color:#00b0f4;margin-bottom:10px;">Comentários <span id="comentariosCount" style="color:#fff;font-size:1rem;font-weight:400;margin-left:8px;"></span></h3>
-              <div style="display:flex;gap:10px;margin-bottom:16px;">
-                <input id="comentarioInput" type="text" placeholder="Escreva seu comentário..." style="flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;">
-                <button id="enviarComentarioBtn" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer;">Enviar</button>
-              </div>
-              <div id="listaComentarios"></div>
-            </div>
+      // Links de imagem
+      .replace(/(https?:\/\/(?:[\w.-]+)\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/gi, '<img src="$1" alt="imagem" style="max-width:320px;max-height:220px;margin:10px 0;border-radius:8px;object-fit:cover;">')
+      // Vídeos do YouTube
+      .replace(/(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+))/gi, function(match, url, id) {
+        let videoId = id;
+        if (url.includes('watch?v=')) {
+          const params = new URLSearchParams(url.split('watch?v=')[1]);
+          videoId = params.get('') || url.split('watch?v=')[1];
+          if (videoId && videoId.includes('&')) videoId = videoId.split('&')[0];
+        }
+        // Wrapper para aspect ratio 16:9 responsivo
+        return `<div style='position:relative;width:100%;padding-bottom:56.25%;margin:10px 0;'><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;display:block;"></iframe></div>`;
+      })
+      // Negrito
+      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+      // Itálico
+      .replace(/\*([^*]+)\*/g, '<i>$1</i>')
+      // Quebra de linha
+      .replace(/\n/g, '<br>');
+    target.innerHTML = `
+      <div style="max-width:600px;margin:40px auto;border-radius:12px;padding:32px 32px 24px 32px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
+            <span style="color:#00b0f4;font-weight:600;font-size:1rem;">${data.usuario || 'anon_user'}</span>
+            <span style="color:#aaa;font-size:0.95rem;margin-left:8px;">${new Date(data.created_at).toLocaleString('pt-BR')}</span>
           </div>
-        `;
+          <button id="voltarMainContent" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-weight:600;cursor:pointer;">Voltar</button>
+        </div>
+        <div style="color:#fff;font-size:1.35rem;font-weight:700;margin-bottom:10px;">${data.titulo || ''}</div>
+        <div style="color:#dcddde;font-size:1.1rem;margin-bottom:18px;">${conteudoFormatado}</div>
+        <div id="comentarios-section" style="margin-top:32px;">
+          <h3 style="color:#00b0f4;margin-bottom:10px;">Comentários <span id="comentariosCount" style="color:#fff;font-size:1rem;font-weight:400;margin-left:8px;"></span></h3>
+          <div style="display:flex;gap:10px;margin-bottom:16px;">
+            <input id="comentarioInput" type="text" placeholder="Escreva seu comentário..." style="flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;">
+            <button id="enviarComentarioBtn" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer;">Enviar</button>
+          </div>
+          <div id="listaComentarios"></div>
+        </div>
+      </div>
+    `;
     // Botão voltar para main-content
     const voltarBtn = document.getElementById('voltarMainContent');
     if (voltarBtn) {
