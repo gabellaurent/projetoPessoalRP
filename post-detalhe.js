@@ -52,7 +52,7 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
       // Detecta links de imagens e renderiza como <img>
       .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:100%;margin:10px 0;border-radius:8px;">');
         target.innerHTML = `
-          <div style="max-width:600px;margin:40px auto;border-radius:12px;padding:32px 32px 24px 32px;">
+          <div style="width:100%;height:100%;max-width:540px;max-height:520px;overflow:auto;margin:0 auto;border-radius:12px;padding:32px 32px 24px 32px;box-sizing:border-box;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;justify-content:space-between;">
               <div style="display:flex;align-items:center;gap:10px;">
                 <div style="width:38px;height:38px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
