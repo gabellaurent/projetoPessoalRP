@@ -14,7 +14,7 @@
         padding: 22px 28px 10px 28px;
         border-bottom: 1px solid #333;
         width: 100%;
-        max-width: 900px;
+        max-width: 60%;
         box-sizing: border-box;
         margin: 0 auto;
       }

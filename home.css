@@ -1,3 +1,98 @@
+/* Estilos para elementos dentro de .navbar-icons */
+.navbar-icons .icon {
+    font-size: 1.7rem;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+#chatIcon {
+    position: relative;
+}
+
+#chat-badge {
+    display: none;
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 0.62em;
+    font-weight: bold;
+    padding: 1px 4px;
+    border-radius: 8px;
+    min-width: 10px;
+    text-align: center;
+    z-index: 2;
+    pointer-events: none;
+    box-shadow: 0 1px 4px #0002;
+    transform: scale(0.7);
+}
+
+#criarPostagemBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #fff;
+    font-size: 1.3rem;
+}
+
+#criarPostagemBtn .criar-postagem-label {
+    font-size: 1em;
+}
+/* Estilos para título e mensagem vazia do notification panel */
+.notification-panel .notification-title {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+.notification-panel .notification-empty {
+    color: #b8c7d1;
+}
+/* Notification panel */
+.notification-panel {
+    display: none;
+    position: absolute;
+    top: 56px;
+    right: 0;
+    width: 220px;
+    background: #2c3e50;
+    padding: 24px;
+    box-sizing: border-box;
+    color: #fff;
+    min-height: 80px;
+    z-index: 101;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+/* Modal de detalhe do post */
+#post-detalhe-modal {
+    display: none;
+    position: absolute;
+    top: 56px;
+    left: 170px;
+    right: 0;
+    bottom: 0;
+    background: rgba(20,24,31,0.92);
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-content {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: #23272a;
+    box-sizing: border-box;
+}
+/* Layout grid para sidebar e main-content */
+.layout-grid {
+    display: grid;
+    grid-template-columns: 20% 1fr;
+    height: calc(100vh - 56px);
+}
 /* Oculta barra de rolagem da main-content (cross-browser) */
 .main-content::-webkit-scrollbar { display: none; }
 .main-content { scrollbar-width: none; -ms-overflow-style: none; }
@@ -53,15 +148,14 @@ h1{
     cursor: pointer;
 }
 .sidebar {
-    position: absolute;
-    top: 56px;
-    left: 0;
-    width: 170px;
-    height: calc(100vh - 56px);
-    background: #23272f;
+    width: 100%;
+    height: 100%;
+    background: #383f4d;
     padding: 24px 0 0 16px;
     box-sizing: border-box;
     border-right: 1px solid #2d3b49;
+    z-index: 1;
+    grid-column: 1;
 }
 .sidebar-user {
     font-size: 1.15rem;
@@ -70,13 +164,10 @@ h1{
     cursor: pointer;
 }
 .main-content {
-    position: absolute;
-    top: 56px;
-    left: 170px;
-    right: 0;
-    bottom: 0;
     background: rgb(35 39 47);
     overflow: hidden;
+    height: 100%;
+    grid-column: 2;
 }
 .profile-panel {
     position: absolute;
