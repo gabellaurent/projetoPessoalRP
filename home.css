@@ -165,7 +165,7 @@ h1{
 }
 .main-content {
     background: rgb(35 39 47);
-    overflow: hidden;
+    overflow-y: auto;
     height: 100%;
     grid-column: 2;
 }

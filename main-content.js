@@ -148,7 +148,7 @@ async function carregarPostagens(targetSelector) {
         .replace(/\n/g, '<br>')
         .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
         .replace(/\*(.*?)\*/g, '<i>$1</i>')
-        .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:320px;max-height:220px;margin:10px 0;border-radius:8px;object-fit:cover;">');
+        .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:100%;margin:10px 0;border-radius:8px;object-fit:cover;">');
       const comentariosCount = comentariosPorPost[post.id] ?? 0;
       return `
         <div class="reddit-post" data-id="${post.id}">
