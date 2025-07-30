@@ -159,7 +159,10 @@
     // Supabase config
     const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    if (!window.supabaseClient) {
+      window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    }
+    const supabase = window.supabaseClient;
 
     const chat = document.getElementById('chat');
     const chatBox = document.querySelector('.chat-box');
@@ -172,7 +175,7 @@
       li.className = 'chat-msg';
       li.dataset.id = msg.id;
       const data = new Date(msg.created_at);
-      const hora = data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const hora = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
       const hoje = new Date();
       const ontem = new Date();
       ontem.setDate(hoje.getDate() - 1);
@@ -180,7 +183,7 @@
       hoje.setHours(0,0,0,0);
       ontem.setHours(0,0,0,0);
       const dataMsg = new Date(data.getFullYear(), data.getMonth(), data.getDate());
-      let diaLabel = data.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: '2-digit' });
+      let diaLabel = data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
       if (dataMsg.getTime() === ontem.getTime()) {
         diaLabel = 'ontem';
       }
