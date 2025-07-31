@@ -3,19 +3,30 @@
 (function() {
   // Monitorar clique no ícone do chat
   document.addEventListener('DOMContentLoaded', function() {
-    var chatIcon = document.getElementById('chatIcon');
-    if (chatIcon) {
-      chatIcon.addEventListener('click', function() {
-        if (!window.chatIsOpen) {
-          document.body.style.overflow = 'hidden';
-          window.supabaseClient.load(function(supabase) {
-            mountChat(supabase);
-          });
-        } else {
-          var root = document.getElementById('chat-root');
-          if (root) root.style.display = '';
-        }
+    function initChat() {
+      window.supabaseClient.load(function(supabase) {
+        mountChat(supabase);
+        var chatRoot = document.getElementById('chat-root');
+        if (chatRoot) chatRoot.style.display = 'none';
       });
+      var chatIcon = document.getElementById('chatIcon');
+      if (chatIcon) {
+        chatIcon.addEventListener('click', function() {
+          var chatRoot = document.getElementById('chat-root');
+          if (chatRoot) {
+            chatRoot.style.display = '';
+            document.body.style.overflow = 'hidden';
+          }
+        });
+      }
+    }
+    if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
+      initChat();
+    } else {
+      var script = document.createElement('script');
+      script.src = 'supabaseClient.js';
+      script.onload = initChat;
+      document.head.appendChild(script);
     }
   });
   // Carrega o supabase-js dinamicamente
@@ -96,8 +107,8 @@
     }
     // Só monta o chat se ainda não existe .chat-wrapper (evita recarregar mensagens)
     if (root.querySelector('.chat-wrapper')) {
-      // Chat já está montado, só mostra
-      root.style.display = '';
+      // Chat já está montado, só esconde
+      root.style.display = 'none';
       return;
     }
     root.innerHTML = '';
@@ -168,8 +179,8 @@
     var closeBtn = wrapper.querySelector('#close-chat');
     if (closeBtn) {
       closeBtn.onclick = function() {
-        if (root && root.parentNode) {
-          root.parentNode.removeChild(root);
+        if (root) {
+          root.style.display = 'none';
         }
         window.chatIsOpen = false;
         document.body.style.overflow = '';
