@@ -147,7 +147,7 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
         <div style="width:50%;max-width:50%;min-width:320px;background:#23272f;box-sizing:border-box;margin:32px auto 32px auto;padding:0 24px 0 0;border-radius:0;min-height:90vh;max-height:90vh;overflow:auto;scrollbar-width:none;-ms-overflow-style:none;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;justify-content:space-between;">
           <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:38px;height:38px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
+            <div style="width:38px;height:38px;border-radius:50%;background:#FFF;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
             <span style="color:#00b0f4;font-weight:600;font-size:1rem;">${data.usuario || 'anon_user'}</span>
             <span style="color:#aaa;font-size:0.95rem;margin-left:8px;">${new Date(data.created_at).toLocaleString('pt-BR')}</span>
           </div>

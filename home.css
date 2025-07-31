@@ -1,3 +1,17 @@
+/* Profile panel visível sobre o conteúdo */
+#profilePanel {
+  position: absolute;
+  top: 60px;
+  right: 32px;
+  min-width: 220px;
+  background: #23272f;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px 0 #0006;
+  z-index: 2000;
+  padding: 24px 18px 18px 18px;
+  display: none;
+}
 /* Estilos para elementos dentro de .navbar-icons */
 .navbar-icons .icon {
     font-size: 1.7rem;
