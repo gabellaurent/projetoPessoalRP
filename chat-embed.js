@@ -1,7 +1,26 @@
 // Chat Supabase em 1 arquivo JS autossuficiente
+// Chat Supabase em 1 arquivo JS autossuficiente
 (function() {
+  // Monitorar clique no ícone do chat
+  document.addEventListener('DOMContentLoaded', function() {
+    var chatIcon = document.getElementById('chatIcon');
+    if (chatIcon) {
+      chatIcon.addEventListener('click', function() {
+        if (!window.chatIsOpen) {
+          document.body.style.overflow = 'hidden';
+          window.supabaseClient.load(function(supabase) {
+            mountChat(supabase);
+          });
+        } else {
+          var root = document.getElementById('chat-root');
+          if (root) root.style.display = '';
+        }
+      });
+    }
+  });
   // Carrega o supabase-js dinamicamente
   function loadSupabase(callback) {
+    if (window.supabaseClient) return callback();
     if (window.supabase) return callback();
     var script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js';
@@ -61,7 +80,7 @@
 
   `;
 
-  function mountChat() {
+  function mountChat(supabase) {
     window.chatIsOpen = true;
     // Adiciona o CSS
     var style = document.createElement('style');
@@ -153,17 +172,9 @@
           root.parentNode.removeChild(root);
         }
         window.chatIsOpen = false;
+        document.body.style.overflow = '';
       };
     }
-
-    // Supabase config
-    const supabaseUrl = 'https://xhybbhdhjaluqjrtopml.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoeWJiaGRoamFsdXFqcnRvcG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzQ5NjMsImV4cCI6MjA2ODg1MDk2M30.Xb98A6l-duDBO6G8_3SPKwluyAm-v8LH5G22ysmSXck';
-    if (!window.supabaseClient) {
-      window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-    }
-    const supabase = window.supabaseClient;
-
     const chat = document.getElementById('chat');
     const chatBox = document.querySelector('.chat-box');
     // const usuarioInput = document.getElementById('usuario'); // Removido
@@ -245,7 +256,7 @@
     carregarMensagens();
   }
 
-  loadSupabase(mountChat);
+  // Não carregar o chat automaticamente ao iniciar a página
   // Se o chat for removido manualmente, também seta flag para false
   window.addEventListener('DOMContentLoaded', function() {
     var root = document.getElementById('chat-root');
