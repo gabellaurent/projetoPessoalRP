@@ -59,7 +59,7 @@
     top: 56px;
     right: 0;
     width: 220px;
-    background: #2c3e50;
+    background: #23272f;
     padding: 24px;
     box-sizing: border-box;
     color: #fff;
@@ -75,7 +75,7 @@
     left: 170px;
     right: 0;
     bottom: 0;
-    background: rgba(20,24,31,0.92);
+    background: #23272f;
     align-items: center;
     justify-content: center;
 }
