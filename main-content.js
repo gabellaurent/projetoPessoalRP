@@ -37,6 +37,17 @@ let supabase;
 
 
 function renderMainContent(targetSelector = '#mainContentPosts') {
+  // Remove qualquer classe de fadeout antes de renderizar
+  const mainContentEl = document.querySelector(targetSelector);
+  if (mainContentEl) {
+    mainContentEl.classList.remove('fadeout-post-main');
+    mainContentEl.classList.remove('visible');
+    // Remove fadeout das postagens antigas
+    mainContentEl.querySelectorAll('.reddit-post').forEach(el => {
+      el.classList.remove('fadeout-post-main');
+      el.style.opacity = '';
+    });
+  }
   if (!window.supabaseClient || typeof window.supabaseClient.load !== 'function') {
     // Carrega supabaseClient.js se não existir ou se load não for função
     const script = document.createElement('script');
@@ -141,15 +152,19 @@ async function carregarPostagens(targetSelector) {
       style.textContent = `
         .fadein-post-main {
           opacity: 0;
-          transition: opacity 0.7s ease;
+          transition: opacity 1s ease;
         }
         .fadein-post-main.visible {
           opacity: 1;
         }
+        .fadeout-post-main {
+          opacity: 0 !important;
+          transition: opacity 1s ease;
+        }
       `;
       document.head.appendChild(style);
     }
-    // Renderiza dentro do container animado
+    // Renderiza dentro do container animado, garantindo que .reddit-post não tenha fadeout
     target.innerHTML = `<div class="fadein-post-main" id="fadeinMainContentContainer">${posts.map(post => {
       const isOwner = username && post.usuario === username;
       let conteudoFormatado = post.conteudo || '';
@@ -160,7 +175,7 @@ async function carregarPostagens(targetSelector) {
         .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:100%;margin:10px 0;border-radius:8px;object-fit:cover;">');
       const comentariosCount = comentariosPorPost[post.id] ?? 0;
       return `
-        <div class="reddit-post" data-id="${post.id}">
+        <div class="reddit-post" data-id="${post.id}" style="opacity:1;">
           <div class="reddit-header">
             <div class="reddit-avatar">${post.usuario ? post.usuario[0].toUpperCase() : 'A'}</div>
             <span class="reddit-username">${post.usuario || 'anon_user'}</span>
@@ -183,6 +198,33 @@ async function carregarPostagens(targetSelector) {
       const fadein = document.getElementById('fadeinMainContentContainer');
       if (fadein) fadein.classList.add('visible');
 
+      // Função para fadeout e abrir modal
+      function fadeoutAndOpen(postId) {
+        const postsEls = fadein.querySelectorAll('.reddit-post');
+        postsEls.forEach(el => {
+          el.classList.add('fadeout-post-main');
+        });
+        setTimeout(() => {
+          const modal = document.getElementById('post-detalhe-modal');
+          if (modal) {
+            modal.style.display = 'flex';
+            modal.innerHTML = '<div id="modal-content" style="box-sizing:border-box;width:100%;height:100%;overflow:auto;position:relative;"></div>';
+            if (!window.renderPostDetalhe) {
+              var script = document.createElement('script');
+              script.src = 'post-detalhe.js';
+              script.onload = function() {
+                window.renderPostDetalhe(postId, '#modal-content');
+                addModalCloseBtn();
+              };
+              document.body.appendChild(script);
+            } else {
+              window.renderPostDetalhe(postId, '#modal-content');
+              addModalCloseBtn();
+            }
+          }
+        }, 1000); // Aguarda 1s para fadeout
+      }
+
       // Adiciona event listener para título e corpo dentro do container animado
       fadein.querySelectorAll('.reddit-title, .reddit-content').forEach(function(el) {
         el.addEventListener('click', function(e) {
@@ -190,24 +232,7 @@ async function carregarPostagens(targetSelector) {
           if (postDiv) {
             const postId = postDiv.getAttribute('data-id');
             localStorage.setItem('post_uuid_clicked', postId);
-            // Agora sempre abre o modal, igual ao clique na postagem inteira
-            const modal = document.getElementById('post-detalhe-modal');
-            if (modal) {
-              modal.style.display = 'flex';
-              modal.innerHTML = '<div id="modal-content" style="background:#23272a;box-sizing:border-box;width:100%;height:100%;overflow:auto;position:relative;"></div>';
-              if (!window.renderPostDetalhe) {
-                var script = document.createElement('script');
-                script.src = 'post-detalhe.js';
-                script.onload = function() {
-                  window.renderPostDetalhe(postId, '#modal-content');
-                  addModalCloseBtn();
-                };
-                document.body.appendChild(script);
-              } else {
-                window.renderPostDetalhe(postId, '#modal-content');
-                addModalCloseBtn();
-              }
-            }
+            fadeoutAndOpen(postId);
           }
           e.stopPropagation();
         });
@@ -224,25 +249,7 @@ async function carregarPostagens(targetSelector) {
           }
           const postId = postEl.getAttribute('data-id');
           localStorage.setItem('post_uuid_clicked', postId);
-          // Renderiza o post-detalhe no modal, sem apagar main-content
-          const modal = document.getElementById('post-detalhe-modal');
-          if (modal) {
-            modal.style.display = 'flex';
-            modal.innerHTML = '<div id="modal-content" style="background:#23272a;box-sizing:border-box;width:100%;height:100%;overflow:auto;position:relative;"></div>';
-            // Carrega post-detalhe.js se necessário
-            if (!window.renderPostDetalhe) {
-              var script = document.createElement('script');
-              script.src = 'post-detalhe.js';
-              script.onload = function() {
-                window.renderPostDetalhe(postId, '#modal-content');
-                addModalCloseBtn();
-              };
-              document.body.appendChild(script);
-            } else {
-              window.renderPostDetalhe(postId, '#modal-content');
-              addModalCloseBtn();
-            }
-          }
+          fadeoutAndOpen(postId);
           e.stopPropagation();
         });
       });

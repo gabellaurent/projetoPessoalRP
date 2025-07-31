@@ -132,51 +132,56 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
       // Detecta links de imagens e renderiza como <img>
       .replace(/(https?:\/\/(?:[\w-]+\.)+[\w-]+\S*?\.(?:jpg|jpeg|png|gif|webp))/gi, '<img src="$1" style="max-width:100%;margin:10px 0;border-radius:8px;">');
 
-    // Adiciona animação fade-in via classe
+    // Adiciona animação fade-in e fade-out via classe nos filhos
     target.innerHTML = `
       <style>
         .fadein-post {
           opacity: 0;
-          transition: opacity 0.7s ease;
+          transition: opacity 0.5s ease;
         }
         .fadein-post.visible {
           opacity: 1;
         }
+        /* fadeout removido */
       </style>
-      <div class="fadein-post" id="fadeinPostContainer" style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#23272f;box-sizing:border-box;margin:0;padding:0;border-radius:0;">
-        <div style="width:50%;max-width:50%;min-width:320px;background:#23272f;box-sizing:border-box;margin:32px auto 32px auto;padding:0 24px 0 0;border-radius:0;min-height:90vh;max-height:90vh;overflow:auto;scrollbar-width:none;-ms-overflow-style:none;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:38px;height:38px;border-radius:50%;background:#FFF;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
-            <span style="color:#00b0f4;font-weight:600;font-size:1rem;">${data.usuario || 'anon_user'}</span>
-            <span style="color:#aaa;font-size:0.95rem;margin-left:8px;">${new Date(data.created_at).toLocaleString('pt-BR')}</span>
+      <div id="fadeinPostContainer" style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;box-sizing:border-box;margin:0;padding:0;border-radius:0;">
+        <div id="postDetalheContent" style="width:50%;max-width:50%;min-width:320px;box-sizing:border-box;margin:32px auto 32px auto;padding:0 24px 0 0;border-radius:0;min-height:90vh;max-height:90vh;overflow:auto;scrollbar-width:none;-ms-overflow-style:none;">
+        <div class="fadein-post" style="display:flex;align-items:center;gap:10px;margin-bottom:8px;justify-content:space-between;">
+          <div class="fadein-post" style="display:flex;align-items:center;gap:10px;">
+            <div class="fadein-post" style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;">${data.usuario ? data.usuario[0].toUpperCase() : 'A'}</div>
+            <span class="fadein-post" style="color:#00b0f4;font-weight:600;font-size:1rem;">${data.usuario || 'anon_user'}</span>
+            <span class="fadein-post" style="color:#aaa;font-size:0.95rem;margin-left:8px;">${new Date(data.created_at).toLocaleString('pt-BR')}</span>
           </div>
-          <button id="voltarMainContent" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-weight:600;cursor:pointer;">Voltar</button>
+          <button class="fadein-post" id="voltarMainContent" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-weight:600;cursor:pointer;">Voltar</button>
         </div>
-        <div style="color:#fff;font-size:1.35rem;font-weight:700;margin-bottom:10px;">${data.titulo || ''}</div>
-        <div style="color:#dcddde;font-size:1.1rem;margin-bottom:18px;">${conteudoFormatado}</div>
-        <div id="comentarios-section" style="margin-top:32px;border-top:1px solid #2d3b49;">
-          <div style="display:flex;gap:10px;margin-bottom:16px;">
-            <input id="comentarioInput" type="text" placeholder="Escreva seu comentário..." style="flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;">
-            <button id="enviarComentarioBtn" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer;">Enviar</button>
+        <div class="fadein-post" style="color:#fff;font-size:1.35rem;font-weight:700;margin-bottom:10px;">${data.titulo || ''}</div>
+        <div class="fadein-post" style="color:#dcddde;font-size:1.1rem;margin-bottom:18px;">${conteudoFormatado}</div>
+        <div id="comentarios-section" style="margin-top:32px;">
+          <div class="fadein-post" style="display:flex;gap:10px;margin-bottom:16px;">
+            <input class="fadein-post" id="comentarioInput" type="text" placeholder="Escreva seu comentário..." style="flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;">
+            <button class="fadein-post" id="enviarComentarioBtn" style="background:#00b0f4;color:#fff;border:none;border-radius:6px;padding:10px 18px;font-weight:600;cursor:pointer;">Enviar</button>
           </div>
-          <h3 style="color:#00b0f4;margin-bottom:10px;">Comentários <span id="comentariosCount" style="color:#fff;font-size:1rem;font-weight:400;margin-left:8px;">(${comentariosCount})</span></h3>
-          <div id="listaComentarios">${comentariosHTML}</div>
+          <h3 class="fadein-post" style="color:#00b0f4;margin-bottom:10px;">Comentários <span id="comentariosCount" style="color:#fff;font-size:1rem;font-weight:400;margin-left:8px;">(${comentariosCount})</span></h3>
+          <div class="fadein-post" id="listaComentarios">${comentariosHTML}</div>
         </div>
       </div>
     </div>
     `;
-    // Animação fade-in
+    // Animação fade-in para todos os filhos
     setTimeout(() => {
-      const fadein = document.getElementById('fadeinPostContainer');
-      if (fadein) fadein.classList.add('visible');
-    }, 50);
+      const fadeinContainer = document.getElementById('fadeinPostContainer');
+      if (fadeinContainer) {
+        fadeinContainer.querySelectorAll('.fadein-post').forEach(el => {
+          el.classList.add('visible');
+        });
+      }
+    }, 500);
 
     // Garante que o embed do vídeo seja processado
     if (window.renderizarVideosYoutube) {
       window.renderizarVideosYoutube(targetSelector);
     }
-    // Botão voltar para main-content
+    // Botão voltar para main-content sem fadeout
     const voltarBtn = document.getElementById('voltarMainContent');
     if (voltarBtn) {
       voltarBtn.onclick = function() {
@@ -190,10 +195,18 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
             script.src = 'main-content.js';
             script.onload = function() {
               window.renderMainContent('.main-content');
+              setTimeout(() => {
+                const fadein = document.getElementById('fadeinMainContentContainer');
+                if (fadein) fadein.classList.add('visible');
+              }, 10);
             };
             document.body.appendChild(script);
           } else {
             window.renderMainContent('.main-content');
+            setTimeout(() => {
+              const fadein = document.getElementById('fadeinMainContentContainer');
+              if (fadein) fadein.classList.add('visible');
+            }, 10);
           }
         }
       };
