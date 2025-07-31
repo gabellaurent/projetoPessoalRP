@@ -37,15 +37,24 @@ let supabase;
 
 
 function renderMainContent(targetSelector = '#mainContentPosts') {
-  if (!window.supabaseClient) {
-    // Carrega supabaseClient.js se não existir
+  if (!window.supabaseClient || typeof window.supabaseClient.load !== 'function') {
+    // Carrega supabaseClient.js se não existir ou se load não for função
     const script = document.createElement('script');
     script.src = 'supabaseClient.js';
     script.onload = () => {
-      window.supabaseClient.load(function(client) {
-        supabase = client;
-        carregarPostagens(targetSelector);
-      });
+      if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
+        window.supabaseClient.load(function(client) {
+          supabase = client;
+          carregarPostagens(targetSelector);
+        });
+      } else {
+        console.error('supabaseClient.load não está disponível após carregar supabaseClient.js');
+        // Opcional: exibir mensagem na tela
+        const target = document.querySelector(targetSelector);
+        if (target) {
+          target.innerHTML = '<p style="color:#ff5555;text-align:center;">Erro ao carregar Supabase. Tente recarregar a página.</p>';
+        }
+      }
     };
     document.head.appendChild(script);
   } else {
