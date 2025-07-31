@@ -177,6 +177,22 @@ async function carregarPostagens(targetSelector) {
         </div>
       `;
     }).join('')}</div>`;
+    // Função para adicionar botão de fechar ao modal
+    function addModalCloseBtn() {
+      const modalContent = document.getElementById('modal-content');
+      if (modalContent && !document.getElementById('modal-close-btn')) {
+        const btn = document.createElement('button');
+        btn.id = 'modal-close-btn';
+        btn.textContent = 'Fechar';
+        btn.style = 'position:absolute;top:10px;right:10px;z-index:1000;padding:8px 16px;background:#5865f2;color:#fff;border:none;border-radius:6px;cursor:pointer;';
+        btn.onclick = function() {
+          const modal = document.getElementById('post-detalhe-modal');
+          if (modal) modal.style.display = 'none';
+        };
+        modalContent.appendChild(btn);
+      }
+    }
+
     // Aplica fade-in
     setTimeout(() => {
       const fadein = document.getElementById('fadeinMainContentContainer');
@@ -241,9 +257,6 @@ async function carregarPostagens(targetSelector) {
               window.renderPostDetalhe(postId, '#modal-content');
               addModalCloseBtn();
             }
-          }
-          function addModalCloseBtn() {
-            const modalContent = document.getElementById('modal-content');
           }
           e.stopPropagation();
         });

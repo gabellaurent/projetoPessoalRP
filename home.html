@@ -14,16 +14,21 @@
     </style>
 </head>
 <body>
-    <div id="loader" style="display:flex;align-items:center;justify-content:center;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#fff;z-index:9999;">
+    <div id="loader" style="display:flex;align-items:center;justify-content:center;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#23272f;z-index:9999;">
         <div style="border:8px solid #f3f3f3;border-top:8px solid #3498db;border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite;"></div>
     </div>
     <div class="navbar">
         <a class="navbar-title" href="#" id="homeLink">MinhaApp</a>
         <div class="navbar-search">
-            <input type="text" placeholder="Pesquisar aqui..">
+            <label for="navbar-search-input" style="display:none;">Pesquisar</label>
+            <input id="navbar-search-input" type="text" placeholder="Pesquisar aqui..">
         </div>
         <div class="navbar-icons">
             <span class="icon" id="bellIcon"><i class="fa-regular fa-bell"></i></span>
+            <span class="icon" id="chatIcon" title="Abrir Chat">
+              <i class="fa-regular fa-comment"></i>
+              <span id="chat-badge">0</span>
+            </span>
             <span class="icon" id="chatIcon" title="Abrir Chat">
               <i class="fa-regular fa-comment"></i>
               <span id="chat-badge">0</span>
