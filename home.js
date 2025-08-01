@@ -133,6 +133,9 @@ window.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('plots-content')?.remove();
                 import('./criarPostagem.js').then(module => {
                     module.criarEditorPostagem('main-content');
+                    // Esconde o botão 'Carregar mais' ao abrir o editor de postagem
+                    const btnCarregarMais = document.getElementById('btn-carregar-mais');
+                    if (btnCarregarMais) btnCarregarMais.style.display = 'none';
                 });
             });
         }

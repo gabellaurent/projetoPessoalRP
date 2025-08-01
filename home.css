@@ -1,3 +1,12 @@
+/* Fade-in para postagens do feed */
+.fadein-post {
+    opacity: 0;
+    animation: fadein-post 0.7s forwards;
+}
+@keyframes fadein-post {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 /* Estilo para o editor de postagem (criar postagem) */
 .criar-postagem-container {
   background: #23272f;
@@ -126,7 +135,7 @@
   padding: 12px 24px;
   margin: 24px auto 16px auto;
   border-radius: 8px;
-  background: #23272f;
+  background: #353942;
   color: #b8c7d1;
   font-size: 1.08rem;
   font-weight: 600;

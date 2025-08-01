@@ -19,9 +19,9 @@ export function criarEditorPostagem(targetId) {
     // Remove editor anterior se existir
     target.querySelector('.criar-postagem-container')?.remove();
 
-    // Cria o container do editor e adiciona ao main-content
+    // Cria o container do editor e adiciona ao main-content com fade-in
     const editorDiv = document.createElement('div');
-    editorDiv.className = 'container criar-postagem-container';
+    editorDiv.className = 'container criar-postagem-container fadein-post';
     editorDiv.innerHTML = `
         <h2>Criar Postagem</h2>
         <form id="postForm">

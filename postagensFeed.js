@@ -43,22 +43,30 @@ export async function renderPostagensFeed() {
         texto = texto.replace(/\n/g, '<br>');
         return texto;
     }
+    // Adiciona fade-in para cada item
+    function fadeInElement(el, delay = 0) {
+        el.classList.add('fadein-post');
+        el.style.animationDelay = delay + 'ms';
+    }
     if (posts.length === 0) {
-        // Nenhuma postagem encontrada, exibe padrão
         const h1 = document.createElement('h1');
         h1.textContent = 'titulo da postagem';
         const p = document.createElement('p');
         p.innerHTML = formatarTexto('corpo da postagem');
         feedContent.appendChild(h1);
         feedContent.appendChild(p);
+        fadeInElement(h1, 0);
+        fadeInElement(p, 100);
     } else {
-        posts.forEach(post => {
+        posts.forEach((post, idx) => {
             const h1 = document.createElement('h1');
             h1.textContent = post.titulo || 'titulo da postagem';
             const p = document.createElement('p');
             p.innerHTML = formatarTexto(post.conteudo || 'corpo da postagem');
             feedContent.appendChild(h1);
             feedContent.appendChild(p);
+            fadeInElement(h1, idx * 100);
+            fadeInElement(p, idx * 100 + 50);
         });
     }
 }
