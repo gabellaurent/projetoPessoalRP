@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', function() {
         function proceed(client) {
             client.auth.getUser().then(({ data }) => {
                 if (!data.user || !data.user.id) {
-                    window.location.href = 'index.html';
+                    window.location.href = 'https://gabellaurent.github.io/projetoPessoalRP/index.html';
                 } else {
                     callback();
                 }
