@@ -25,6 +25,7 @@ export function criarEditorPostagem(targetId) {
     editorDiv.innerHTML = `
         <h2>Criar Postagem</h2>
         <form id="postForm">
+            <input type="text" id="tituloPost" placeholder="Título da postagem" required style="width:100%;margin-bottom:10px;" />
             <div id="editor"></div>
             <button type="submit">Publicar</button>
         </form>
@@ -41,16 +42,64 @@ export function criarEditorPostagem(targetId) {
         inicializarQuill();
     }
 
-    function inicializarQuill() {
+    async function inicializarQuill() {
         const quill = new Quill('#editor', {
             theme: 'snow',
             placeholder: 'Escreva sua postagem aqui...'
         });
-        document.getElementById('postForm').onsubmit = function(e) {
+        document.getElementById('postForm').onsubmit = async function(e) {
             e.preventDefault();
-            var conteudo = quill.root.innerHTML;
-            alert('Conteúdo da postagem:\n' + conteudo);
-            // Aqui você pode enviar o conteúdo para o backend
+            const titulo = document.getElementById('tituloPost').value.trim();
+            const conteudo = quill.root.innerHTML;
+
+            // Supondo que a uuid do usuário logado está disponível em window.userUUID
+            const userUUID = window.userUUID;
+            if (!userUUID) {
+                alert('Usuário não logado.');
+                return;
+            }
+
+            // Usa o supabaseClient global
+            let supabase = await new Promise((resolve, reject) => {
+                if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
+                    window.supabaseClient.load(client => resolve(client));
+                } else {
+                    reject('SupabaseClient não carregado');
+                }
+            });
+
+            // Busca o username na tabela base-users
+            const { data: userData, error: userError } = await supabase
+                .from('base-users')
+                .select('username')
+                .eq('id', userUUID)
+                .single();
+            if (userError || !userData) {
+                alert('Erro ao buscar usuário.');
+                return;
+            }
+            const author = userData.username;
+
+            // Data de criação
+            const created_at = new Date().toISOString();
+
+            // Salva na tabela posts
+            const { error: postError } = await supabase
+                .from('posts')
+                .insert([
+                    {
+                        titulo,
+                        author,
+                        created_at,
+                        post_content: conteudo
+                    }
+                ]);
+            if (postError) {
+                alert('Erro ao salvar postagem: ' + postError.message);
+            } else {
+                alert('Postagem publicada com sucesso!');
+                // Opcional: Limpar o editor ou redirecionar
+            }
         };
     }
 }

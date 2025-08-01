@@ -18,6 +18,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 if (!data.user || !data.user.id) {
                     window.location.href = 'https://gabellaurent.github.io/socialproject/index.html';
                 } else {
+                    window.userUUID = data.user.id; // Torna o uuid global
                     callback();
                 }
             });

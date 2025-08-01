@@ -13,7 +13,7 @@ export async function renderPostagensFeed() {
     if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
         await new Promise(resolve => {
             window.supabaseClient.load(async function(client) {
-                const { data, error } = await client.from('posts').select('titulo, conteudo').order('created_at', { ascending: false });
+                const { data, error } = await client.from('posts').select('titulo, post_content').order('created_at', { ascending: false });
                 if (data && data.length > 0) {
                     posts = data;
                 }
@@ -62,7 +62,7 @@ export async function renderPostagensFeed() {
             const h1 = document.createElement('h1');
             h1.textContent = post.titulo || 'titulo da postagem';
             const p = document.createElement('p');
-            p.innerHTML = formatarTexto(post.conteudo || 'corpo da postagem');
+            p.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
             feedContent.appendChild(h1);
             feedContent.appendChild(p);
             fadeInElement(h1, idx * 100);

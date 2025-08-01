@@ -319,13 +319,13 @@
                     return;
                 }
 
-                // Alimenta a tabela base-users
+                // Alimenta a tabela base_users
                 try {
                     // O id uuid do usuário criado no auth
                     const userId = data.user?.id;
                     if (userId) {
                         const now = new Date().toISOString();
-                        const { error: insertError } = await supabase.from('base-users').insert([
+                        const { error: insertError } = await supabase.from('base_users').insert([
                             {
                                 id: userId,
                                 username,
@@ -337,11 +337,11 @@
                         ]);
                         if (insertError) {
                             // Apenas loga o erro, não bloqueia o registro
-                            console.error('Erro ao inserir na base-users:', insertError.message);
+                            console.error('Erro ao inserir na base_users:', insertError.message);
                         }
                     }
                 } catch (e) {
-                    console.error('Erro inesperado ao inserir na base-users:', e);
+                    console.error('Erro inesperado ao inserir na base_users:', e);
                 }
 
                 msg.textContent = 'Registro realizado! Verifique seu email.';
