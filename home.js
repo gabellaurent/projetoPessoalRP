@@ -84,9 +84,33 @@ window.addEventListener('DOMContentLoaded', function() {
         checkReady();
     };
     // Importa dinamicamente a função renderPostagensFeed do postagensFeed.js
+    let feedAtivo = true;
     import('./postagensFeed.js').then(module => {
         module.renderPostagensFeed();
         showMainContentWhenReady();
+        // Adiciona funcionalidade ao menu da sidebar
+        const btnRoleplays = document.getElementById('menu-roleplays');
+        if (btnRoleplays) {
+            btnRoleplays.addEventListener('click', function(e) {
+                e.preventDefault();
+                const feedContent = document.getElementById('feed-content');
+                if (feedContent) {
+                    feedContent.style.display = 'none';
+                    feedAtivo = false;
+                }
+            });
+        }
+        const btnFeed = document.getElementById('menu-feed');
+        if (btnFeed) {
+            btnFeed.addEventListener('click', function(e) {
+                e.preventDefault();
+                const feedContent = document.getElementById('feed-content');
+                if (feedContent && !feedAtivo) {
+                    feedContent.style.display = 'block';
+                    feedAtivo = true;
+                }
+            });
+        }
     }).catch(() => {
         showMainContentWhenReady();
     });
