@@ -1,4 +1,3 @@
-// Carrega main-content.js automaticamente ao abrir o site
 window.addEventListener('DOMContentLoaded', function() {
     // Verifica sessão ativa do Supabase antes de carregar o conteúdo
     function checkAuthAndContinue(callback) {
@@ -84,20 +83,13 @@ window.addEventListener('DOMContentLoaded', function() {
         };
         checkReady();
     };
-    if (!window.renderMainContent) {
-        var oldScript = document.querySelector('script[src="main-content.js"]');
-        if (oldScript) oldScript.remove();
-        var script = document.createElement('script');
-        script.src = 'main-content.js';
-        script.onload = function() {
-            if (window.renderMainContent) window.renderMainContent('.main-content');
-            showMainContentWhenReady();
-        };
-        document.body.appendChild(script);
-    } else {
-        window.renderMainContent('.main-content');
+    // Importa dinamicamente a função renderPostagensFeed do postagensFeed.js
+    import('./postagensFeed.js').then(module => {
+        module.renderPostagensFeed();
         showMainContentWhenReady();
-    }
+    }).catch(() => {
+        showMainContentWhenReady();
+    });
 
 });
 

@@ -195,18 +195,10 @@ function renderPostDetalhe(postId, targetSelector = '.main-content') {
             script.src = 'main-content.js';
             script.onload = function() {
               window.renderMainContent('.main-content');
-              setTimeout(() => {
-                const fadein = document.getElementById('fadeinMainContentContainer');
-                if (fadein) fadein.classList.add('visible');
-              }, 10);
             };
             document.body.appendChild(script);
           } else {
             window.renderMainContent('.main-content');
-            setTimeout(() => {
-              const fadein = document.getElementById('fadeinMainContentContainer');
-              if (fadein) fadein.classList.add('visible');
-            }, 10);
           }
         }
       };

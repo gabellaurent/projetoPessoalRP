@@ -6,17 +6,8 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="home.css">
-    <style>
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    </style>
 </head>
 <body>
-    <div id="loader" style="display:flex;align-items:center;justify-content:center;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#23272f;z-index:9999;">
-        <div style="border:8px solid #f3f3f3;border-top:8px solid #3498db;border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite;"></div>
-    </div>
     <div class="navbar">
         <a class="navbar-title" href="#" id="homeLink">MinhaApp</a>
         <div class="navbar-search">
@@ -29,10 +20,6 @@
               <i class="fa-regular fa-comment"></i>
               <span id="chat-badge">0</span>
             </span>
-            <span class="icon" id="chatIcon" title="Abrir Chat">
-              <i class="fa-regular fa-comment"></i>
-              <span id="chat-badge">0</span>
-            </span>
             <span class="icon" id="criarPostagemBtn" title="Criar Postagem">
               <i class="fa-solid fa-plus"></i> <span class="criar-postagem-label">Criar Postagem</span>
             </span>
@@ -41,12 +28,17 @@
     </div>
     <div class="layout-grid">
       <div class="sidebar">
-          <!-- Área reservada para futuros usos -->
+          <nav class="sidebar-menu">
+            <ul>
+              <li><a href="#" id="menu-feed">Postagens Feed</a></li>
+              <li><a href="#" id="menu-roleplays">Meus roleplays</a></li>
+              <li><a href="#" id="menu-personagens">Meus personagens</a></li>
+              <li><a href="#" id="menu-plots">Meus plots</a></li>
+            </ul>
+          </nav>
       </div>
-      <div class="main-content" style="position:relative;">
-        <div id="loader" style="display:flex;align-items:center;justify-content:center;position:absolute;top:0;left:0;width:100%;height:100%;background:#23272f;z-index:9999;">
-            <div style="border:8px solid #f3f3f3;border-top:8px solid #3498db;border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite;"></div>
-        </div>
+      <div id="main-content" class="main-content">
+
       </div>
       <div class="extra-sidebar">
           <!-- Terceira coluna: conteúdo extra -->
