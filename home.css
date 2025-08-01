@@ -14,6 +14,7 @@
   width: 100%;
 }
 .sidebar-menu a {
+    
   display: flex;
   align-items: center;
   padding: 12px 18px;
@@ -27,37 +28,43 @@
   box-shadow: 0 1px 4px #0002;
   border: none;
   cursor: pointer;
+  width: max-content;
+  min-width: 0;
+  padding: 12px 18px;
 }
 .sidebar-menu a:hover, .sidebar-menu a:focus {
   background: #5865f2;
   color: #fff;
   outline: none;
 }
-.sidebar-menu a:active {
-  background: #4752c4;
+/* Botão 'Carregar mais' estilo Discord */
+/* Botão 'Carregar mais' estilo Discord */
+.btn-carregar-mais {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  margin: 24px auto 16px auto;
+  border-radius: 8px;
+  background: #23272f;
+  color: #b8c7d1;
+  font-size: 1.08rem;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 1px 4px #0002;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  width: max-content;
+  min-width: 0;
 }
-/* Loader dentro de .main-content deve ser absoluto e ocupar 100% */
-.main-content .loader {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+.btn-carregar-mais:hover, .btn-carregar-mais:focus {
+  background: #5865f2;
+  color: #fff;
+  outline: none;
 }
 /* Main content positioning */
 .main-content {
   position: relative;
-}
-/* Loader styles */
-.loader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #23272f;
-  z-index: 9999;
 }
 
 /* For loader inside main-content, override to absolute and 100% width/height */
@@ -67,19 +74,8 @@
   height: 100%;
 }
 
-.loader-spinner {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #3498db;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-/* Profile panel visível sobre o conteúdo */
+
+/* Profile panel */
 #profilePanel {
   position: absolute;
   top: 60px;
@@ -246,12 +242,17 @@ h1{
     width: 100%;
     height: 100%;
     background: #23272f;
-    padding: 24px 0 0 16px;
+    padding: 0px 20px 0px 20px;
     box-sizing: border-box;
     border-right: 1px solid #2d3b49;
     z-index: 1;
     grid-column: 1;
 }
+
+.sidebar-menu li {
+  width: 100px;
+}
+
 .sidebar-user {
     font-size: 1.15rem;
     font-weight: 700;

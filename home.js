@@ -1,3 +1,11 @@
+    // Garante que o botão 'Carregar mais' fique sempre no final do main-content
+    function posicionarBotaoCarregarMais() {
+        const mainContent = document.getElementById('main-content');
+        const btn = document.getElementById('btn-carregar-mais');
+        if (mainContent && btn) {
+            mainContent.appendChild(btn);
+        }
+    }
 window.addEventListener('DOMContentLoaded', function() {
     // Verifica sessão ativa do Supabase antes de carregar o conteúdo
     function checkAuthAndContinue(callback) {
@@ -88,16 +96,51 @@ window.addEventListener('DOMContentLoaded', function() {
     import('./postagensFeed.js').then(module => {
         module.renderPostagensFeed();
         showMainContentWhenReady();
+        posicionarBotaoCarregarMais();
         // Adiciona funcionalidade ao menu da sidebar
         const btnRoleplays = document.getElementById('menu-roleplays');
         if (btnRoleplays) {
             btnRoleplays.addEventListener('click', function(e) {
                 e.preventDefault();
                 const feedContent = document.getElementById('feed-content');
-                if (feedContent) {
-                    feedContent.style.display = 'none';
-                    feedAtivo = false;
-                }
+                if (feedContent) feedContent.style.display = 'none';
+                feedAtivo = false;
+                document.getElementById('personagens-content')?.remove();
+                document.getElementById('plots-content')?.remove();
+                import('./meusRoleplays.js').then(module => {
+                    module.renderRoleplays();
+                    posicionarBotaoCarregarMais();
+                });
+            });
+        }
+        const btnPersonagens = document.getElementById('menu-personagens');
+        if (btnPersonagens) {
+            btnPersonagens.addEventListener('click', function(e) {
+                e.preventDefault();
+                const feedContent = document.getElementById('feed-content');
+                if (feedContent) feedContent.style.display = 'none';
+                feedAtivo = false;
+                document.getElementById('roleplays-content')?.remove();
+                document.getElementById('plots-content')?.remove();
+                import('./Personagens.js').then(module => {
+                    module.renderPersonagens();
+                    posicionarBotaoCarregarMais();
+                });
+            });
+        }
+        const btnPlots = document.getElementById('menu-plots');
+        if (btnPlots) {
+            btnPlots.addEventListener('click', function(e) {
+                e.preventDefault();
+                const feedContent = document.getElementById('feed-content');
+                if (feedContent) feedContent.style.display = 'none';
+                feedAtivo = false;
+                document.getElementById('roleplays-content')?.remove();
+                document.getElementById('personagens-content')?.remove();
+                import('./meusPlots.js').then(module => {
+                    module.renderPlots();
+                    posicionarBotaoCarregarMais();
+                });
             });
         }
         const btnFeed = document.getElementById('menu-feed');
@@ -109,6 +152,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     feedContent.style.display = 'block';
                     feedAtivo = true;
                 }
+                posicionarBotaoCarregarMais();
             });
         }
     }).catch(() => {
