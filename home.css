@@ -1,3 +1,65 @@
+/* Estilo para o editor de postagem (criar postagem) */
+.criar-postagem-container {
+  background: #23272f;
+  border-radius: 10px;
+  padding: 32px 28px 24px 28px;
+  margin: 32px auto;
+  max-width: 600px;
+}
+.criar-postagem-container h2 {
+  color: #5865f2;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.criar-postagem-container #editor {
+  background: #ccd1db;
+  border-radius: 0 0 8px 8px;
+  min-height: 220px;
+  margin-bottom: 22px;
+  color: #292929;
+  font-size: 1.13rem;
+  box-shadow: 0 1px 4px #0002;
+}
+.criar-postagem-container .ql-toolbar {
+  background: #ccd1db;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid #5865f2;
+}
+.criar-postagem-container .ql-container {
+  border-radius: 3px;
+  border: none;
+}
+.criar-postagem-container .ql-editor p {    
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: #292929;
+}
+
+.criar-postagem-container button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  background: #5865f2;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px #0002;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.18s, color 0.18s;
+}
+.criar-postagem-container button[type="submit"]:hover,
+.criar-postagem-container button[type="submit"]:focus {
+  background: #4752c4;
+  color: #fff;
+  outline: none;
+}
 /* Embeds responsivos para vídeos do YouTube no feed */
 .youtube-embed {
   position: relative;
