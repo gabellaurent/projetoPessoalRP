@@ -13,7 +13,7 @@ export async function renderPostagensFeed() {
     if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
         await new Promise(resolve => {
             window.supabaseClient.load(async function(client) {
-                const { data, error } = await client.from('posts').select('titulo, conteudo').order('id', { ascending: true });
+                const { data, error } = await client.from('posts').select('titulo, conteudo').order('created_at', { ascending: false });
                 if (data && data.length > 0) {
                     posts = data;
                 }

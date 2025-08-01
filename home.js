@@ -1,3 +1,7 @@
+        // Função para remover o editor de postagem do main-content
+        const removeCriarPostagem = () => {
+            document.querySelector('.criar-postagem-container')?.remove();
+        };
     // Garante que o botão 'Carregar mais' fique sempre no final do main-content
     function posicionarBotaoCarregarMais() {
         const mainContent = document.getElementById('main-content');
@@ -102,6 +106,7 @@ window.addEventListener('DOMContentLoaded', function() {
         if (btnRoleplays) {
             btnRoleplays.addEventListener('click', function(e) {
                 e.preventDefault();
+                removeCriarPostagem();
                 const feedContent = document.getElementById('feed-content');
                 if (feedContent) feedContent.style.display = 'none';
                 feedAtivo = false;
@@ -113,10 +118,29 @@ window.addEventListener('DOMContentLoaded', function() {
                 });
             });
         }
+
+        // Adiciona funcionalidade ao botão 'Criar Postagem'
+        const btnCriarPostagem = document.getElementById('criarPostagemBtn');
+        if (btnCriarPostagem) {
+            btnCriarPostagem.addEventListener('click', function(e) {
+                e.preventDefault();
+                removeCriarPostagem();
+                const feedContent = document.getElementById('feed-content');
+                if (feedContent) feedContent.style.display = 'none';
+                feedAtivo = false;
+                document.getElementById('roleplays-content')?.remove();
+                document.getElementById('personagens-content')?.remove();
+                document.getElementById('plots-content')?.remove();
+                import('./criarPostagem.js').then(module => {
+                    module.criarEditorPostagem('main-content');
+                });
+            });
+        }
         const btnPersonagens = document.getElementById('menu-personagens');
         if (btnPersonagens) {
             btnPersonagens.addEventListener('click', function(e) {
                 e.preventDefault();
+                removeCriarPostagem();
                 const feedContent = document.getElementById('feed-content');
                 if (feedContent) feedContent.style.display = 'none';
                 feedAtivo = false;
@@ -132,6 +156,7 @@ window.addEventListener('DOMContentLoaded', function() {
         if (btnPlots) {
             btnPlots.addEventListener('click', function(e) {
                 e.preventDefault();
+                removeCriarPostagem();
                 const feedContent = document.getElementById('feed-content');
                 if (feedContent) feedContent.style.display = 'none';
                 feedAtivo = false;
@@ -147,8 +172,9 @@ window.addEventListener('DOMContentLoaded', function() {
         if (btnFeed) {
             btnFeed.addEventListener('click', function(e) {
                 e.preventDefault();
+                removeCriarPostagem();
                 const feedContent = document.getElementById('feed-content');
-                if (feedContent && !feedAtivo) {
+                if (feedContent) {
                     feedContent.style.display = 'block';
                     feedAtivo = true;
                 }
