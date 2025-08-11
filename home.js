@@ -36,6 +36,23 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     checkAuthAndContinue(function() {
+    // Exibe o nome do usuário logado no painel de perfil
+    if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
+        window.supabaseClient.load(async function(client) {
+            const userUUID = window.userUUID;
+            if (userUUID) {
+                const { data, error } = await client
+                    .from('base_users')
+                    .select('username')
+                    .eq('id', userUUID)
+                    .single();
+                if (data && data.username) {
+                    const profileUsername = document.getElementById('profile-username');
+                    if (profileUsername) profileUsername.textContent = data.username;
+                }
+            }
+        });
+    }
     // Mostrar/ocultar painel de perfil ao clicar no ícone de usuário
     var userIcon = document.getElementById('userIcon');
     var profilePanel = document.getElementById('profilePanel');
