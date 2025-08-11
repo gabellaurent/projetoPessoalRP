@@ -122,6 +122,10 @@ window.addEventListener('DOMContentLoaded', function() {
         showMainContentWhenReady();
         posicionarBotaoCarregarMais();
 
+    // Garante que o botão 'Carregar mais' só apareça no menu 'Postagens Feed'
+    const btnCarregarMais = document.getElementById('btn-carregar-mais');
+    if (btnCarregarMais) btnCarregarMais.style.display = 'block';
+
         // Adiciona funcionalidade ao menu da sidebar
         const btnRoleplays = document.getElementById('menu-roleplays');
         if (btnRoleplays) {
@@ -133,6 +137,9 @@ window.addEventListener('DOMContentLoaded', function() {
                 feedAtivo = false;
                 document.getElementById('personagens-content')?.remove();
                 document.getElementById('plots-content')?.remove();
+                // Esconde o botão 'Carregar mais' ao sair do feed
+                const btnCarregarMais = document.getElementById('btn-carregar-mais');
+                if (btnCarregarMais) btnCarregarMais.style.display = 'none';
                 import('./meusRoleplays.js').then(module => {
                     module.renderRoleplays();
                     posicionarBotaoCarregarMais();
@@ -170,6 +177,9 @@ window.addEventListener('DOMContentLoaded', function() {
                 feedAtivo = false;
                 document.getElementById('roleplays-content')?.remove();
                 document.getElementById('plots-content')?.remove();
+                // Esconde o botão 'Carregar mais' ao sair do feed
+                const btnCarregarMais = document.getElementById('btn-carregar-mais');
+                if (btnCarregarMais) btnCarregarMais.style.display = 'none';
                 import('./Personagens.js').then(module => {
                     module.renderPersonagens();
                     posicionarBotaoCarregarMais();
@@ -186,6 +196,9 @@ window.addEventListener('DOMContentLoaded', function() {
                 feedAtivo = false;
                 document.getElementById('roleplays-content')?.remove();
                 document.getElementById('personagens-content')?.remove();
+                // Esconde o botão 'Carregar mais' ao sair do feed
+                const btnCarregarMais = document.getElementById('btn-carregar-mais');
+                if (btnCarregarMais) btnCarregarMais.style.display = 'none';
                 import('./meusPlots.js').then(module => {
                     module.renderPlots();
                     posicionarBotaoCarregarMais();
@@ -205,7 +218,9 @@ window.addEventListener('DOMContentLoaded', function() {
                 // Chama a função incremental para adicionar só novas postagens
                 const novosIds = await module.adicionarNovasPostagensFeed(postIdsExibidos);
                 postIdsExibidos = postIdsExibidos.concat(novosIds);
-                posicionarBotaoCarregarMais();
+                // Exibe o botão 'Carregar mais' apenas no menu 'Postagens Feed'
+                const btnCarregarMais = document.getElementById('btn-carregar-mais');
+                if (btnCarregarMais) btnCarregarMais.style.display = 'block';
             });
         }
     }).catch(() => {
