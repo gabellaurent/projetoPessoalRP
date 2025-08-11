@@ -98,10 +98,13 @@ window.addEventListener('DOMContentLoaded', function() {
     };
     // Importa dinamicamente a função renderPostagensFeed do postagensFeed.js
     let feedAtivo = true;
+    let postIdsExibidos = [];
     import('./postagensFeed.js').then(module => {
+        // Carrega o feed inicial e salva os IDs exibidos
         module.renderPostagensFeed();
         showMainContentWhenReady();
         posicionarBotaoCarregarMais();
+
         // Adiciona funcionalidade ao menu da sidebar
         const btnRoleplays = document.getElementById('menu-roleplays');
         if (btnRoleplays) {
@@ -174,7 +177,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }
         const btnFeed = document.getElementById('menu-feed');
         if (btnFeed) {
-            btnFeed.addEventListener('click', function(e) {
+            btnFeed.addEventListener('click', async function(e) {
                 e.preventDefault();
                 removeCriarPostagem();
                 const feedContent = document.getElementById('feed-content');
@@ -182,6 +185,9 @@ window.addEventListener('DOMContentLoaded', function() {
                     feedContent.style.display = 'block';
                     feedAtivo = true;
                 }
+                // Chama a função incremental para adicionar só novas postagens
+                const novosIds = await module.adicionarNovasPostagensFeed(postIdsExibidos);
+                postIdsExibidos = postIdsExibidos.concat(novosIds);
                 posicionarBotaoCarregarMais();
             });
         }

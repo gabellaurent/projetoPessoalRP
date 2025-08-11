@@ -55,7 +55,7 @@ export function criarEditorPostagem(targetId) {
             // Supondo que a uuid do usuário logado está disponível em window.userUUID
             const userUUID = window.userUUID;
             if (!userUUID) {
-                alert('Usuário não logado.');
+                // Usuário não logado
                 return;
             }
 
@@ -70,12 +70,12 @@ export function criarEditorPostagem(targetId) {
 
             // Busca o username na tabela base-users
             const { data: userData, error: userError } = await supabase
-                .from('base-users')
+                .from('base_users')
                 .select('username')
                 .eq('id', userUUID)
                 .single();
             if (userError || !userData) {
-                alert('Erro ao buscar usuário.');
+                // Erro ao buscar usuário
                 return;
             }
             const author = userData.username;
@@ -84,21 +84,36 @@ export function criarEditorPostagem(targetId) {
             const created_at = new Date().toISOString();
 
             // Salva na tabela posts
-            const { error: postError } = await supabase
+            const { data: postData, error: postError } = await supabase
                 .from('posts')
                 .insert([
                     {
                         titulo,
                         author,
+                        author_id: userUUID,
                         created_at,
                         post_content: conteudo
                     }
-                ]);
+                ])
+                .select();
             if (postError) {
-                alert('Erro ao salvar postagem: ' + postError.message);
+                // Erro ao salvar postagem
             } else {
-                alert('Postagem publicada com sucesso!');
-                // Opcional: Limpar o editor ou redirecionar
+                // Remove o editor e exibe o feed
+                document.querySelector('.criar-postagem-container')?.remove();
+                const feedContent = document.getElementById('feed-content');
+                if (feedContent) feedContent.style.display = 'block';
+                // Adiciona o novo post ao topo do feed
+                if (postData && postData[0] && postData[0].id) {
+                    import('./postagensFeed.js').then(module => {
+                        module.adicionarNovasPostagensFeed([]).then(() => {
+                            // Opcional: adiciona o novo ID ao array global
+                            if (window.postIdsExibidos && typeof window.postIdsExibidos === 'object') {
+                                window.postIdsExibidos.unshift(postData[0].id);
+                            }
+                        });
+                    });
+                }
             }
         };
     }

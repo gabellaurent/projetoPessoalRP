@@ -1,4 +1,52 @@
 // Função para buscar e exibir todas as postagens no main-content
+// Função incremental para adicionar apenas novas postagens ao feed
+export async function adicionarNovasPostagensFeed(postIdsExibidos = []) {
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+    let feedContent = document.getElementById('feed-content');
+    if (!feedContent) {
+        feedContent = document.createElement('div');
+        feedContent.id = 'feed-content';
+        mainContent.appendChild(feedContent);
+    }
+    let novosPosts = [];
+    if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
+        await new Promise(resolve => {
+            window.supabaseClient.load(async function(client) {
+                const { data, error } = await client
+                    .from('posts')
+                    .select('id, titulo, post_content, created_at')
+                    .order('created_at', { ascending: false });
+                if (data && data.length > 0) {
+                    novosPosts = data.filter(post => !postIdsExibidos.includes(post.id));
+                }
+                resolve();
+            });
+        });
+    }
+    novosPosts.forEach((post, idx) => {
+        // Evita duplicação: verifica se já existe um h1 com o mesmo texto e um p com o mesmo conteúdo
+        const existeH1 = Array.from(feedContent.querySelectorAll('h1')).some(h => h.textContent === (post.titulo || 'titulo da postagem'));
+        const existeP = Array.from(feedContent.querySelectorAll('p')).some(pEl => pEl.innerHTML === (post.post_content || 'corpo da postagem'));
+        if (!existeH1 || !existeP) {
+            const h1 = document.createElement('h1');
+            h1.textContent = post.titulo || 'titulo da postagem';
+            const p = document.createElement('p');
+            p.innerHTML = post.post_content || 'corpo da postagem';
+            h1.classList.add('fadein-post');
+            p.classList.add('fadein-post');
+            // Insere no topo do feed
+            if (feedContent.firstChild) {
+                feedContent.insertBefore(p, feedContent.firstChild);
+                feedContent.insertBefore(h1, p);
+            } else {
+                feedContent.appendChild(h1);
+                feedContent.appendChild(p);
+            }
+        }
+    });
+    return novosPosts.map(post => post.id);
+}
 export async function renderPostagensFeed() {
     const mainContent = document.getElementById('main-content');
     if (!mainContent) return;
@@ -10,12 +58,18 @@ export async function renderPostagensFeed() {
     }
     feedContent.innerHTML = '';
     let posts = [];
+    let totalPosts = 0;
     if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
         await new Promise(resolve => {
             window.supabaseClient.load(async function(client) {
-                const { data, error } = await client.from('posts').select('titulo, post_content').order('created_at', { ascending: false });
+                const { data, count, error } = await client
+                    .from('posts')
+                    .select('titulo, post_content', { count: 'exact' })
+                    .order('created_at', { ascending: false })
+                    .limit(15);
                 if (data && data.length > 0) {
                     posts = data;
+                    totalPosts = count || data.length;
                 }
                 resolve();
             });
@@ -68,5 +122,50 @@ export async function renderPostagensFeed() {
             fadeInElement(h1, idx * 100);
             fadeInElement(p, idx * 100 + 50);
         });
+        // Adiciona botão 'Carregar mais' se houver mais postagens
+        if (totalPosts > posts.length) {
+            let btnCarregarMais = document.getElementById('btn-carregar-mais');
+            if (!btnCarregarMais) {
+                btnCarregarMais = document.createElement('button');
+                btnCarregarMais.id = 'btn-carregar-mais';
+                btnCarregarMais.className = 'btn-carregar-mais';
+                btnCarregarMais.textContent = 'Carregar mais';
+            }
+            btnCarregarMais.onclick = async function() {
+                // Busca mais postagens e adiciona ao final
+                let offset = feedContent.querySelectorAll('h1').length;
+                if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
+                    await new Promise(resolve => {
+                        window.supabaseClient.load(async function(client) {
+                            const { data, error } = await client
+                                .from('posts')
+                                .select('titulo, post_content')
+                                .order('created_at', { ascending: false })
+                                .range(offset, offset + 14);
+                            if (data && data.length > 0) {
+                                data.forEach((post, idx) => {
+                                    const h1 = document.createElement('h1');
+                                    h1.textContent = post.titulo || 'titulo da postagem';
+                                    const p = document.createElement('p');
+                                    p.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
+                                    feedContent.appendChild(h1);
+                                    feedContent.appendChild(p);
+                                    fadeInElement(h1, (offset + idx) * 100);
+                                    fadeInElement(p, (offset + idx) * 100 + 50);
+                                });
+                                // Remove botão se não houver mais postagens
+                                if (data.length < 15) {
+                                    btnCarregarMais.remove();
+                                }
+                            } else {
+                                btnCarregarMais.remove();
+                            }
+                            resolve();
+                        });
+                    });
+                }
+            };
+            feedContent.appendChild(btnCarregarMais);
+        }
     }
 }
