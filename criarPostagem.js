@@ -49,13 +49,28 @@ export function criarEditorPostagem(targetId) {
         });
         document.getElementById('postForm').onsubmit = async function(e) {
             e.preventDefault();
+            const btnPublicar = document.querySelector('#postForm button[type="submit"]');
+            if (btnPublicar) {
+                btnPublicar.disabled = true;
+                btnPublicar.innerHTML = '<span class="spinner" style="display:inline-block;width:18px;height:18px;border:3px solid #fff;border-top:3px solid #6366f1;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;"></span> Publicando...';
+                if (!document.getElementById('publicar-spinner-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'publicar-spinner-style';
+                    style.innerHTML = '@keyframes spin { 0% { transform: rotate(0deg);} 100% {transform: rotate(360deg);} }';
+                    document.head.appendChild(style);
+                }
+            }
+
             const titulo = document.getElementById('tituloPost').value.trim();
             const conteudo = quill.root.innerHTML;
 
             // Supondo que a uuid do usuário logado está disponível em window.userUUID
             const userUUID = window.userUUID;
             if (!userUUID) {
-                // Usuário não logado
+                if (btnPublicar) {
+                    btnPublicar.disabled = false;
+                    btnPublicar.innerHTML = 'Publicar';
+                }
                 return;
             }
 
@@ -75,7 +90,10 @@ export function criarEditorPostagem(targetId) {
                 .eq('id', userUUID)
                 .single();
             if (userError || !userData) {
-                // Erro ao buscar usuário
+                if (btnPublicar) {
+                    btnPublicar.disabled = false;
+                    btnPublicar.innerHTML = 'Publicar';
+                }
                 return;
             }
             const author = userData.username;
@@ -97,13 +115,13 @@ export function criarEditorPostagem(targetId) {
                 ])
                 .select();
             if (postError) {
+                if (btnPublicar) {
+                    btnPublicar.disabled = false;
+                    btnPublicar.innerHTML = 'Publicar';
+                }
                 // Erro ao salvar postagem
             } else {
-                // Remove o editor e exibe o feed
-                document.querySelector('.criar-postagem-container')?.remove();
-                const feedContent = document.getElementById('feed-content');
-                if (feedContent) feedContent.style.display = 'block';
-                // Adiciona o novo post ao topo do feed
+                // Adiciona o novo post ao topo do feed e só remove o editor após garantir que foi carregado
                 if (postData && postData[0] && postData[0].id) {
                     import('./postagensFeed.js').then(module => {
                         module.adicionarNovasPostagensFeed([]).then(() => {
@@ -111,8 +129,17 @@ export function criarEditorPostagem(targetId) {
                             if (window.postIdsExibidos && typeof window.postIdsExibidos === 'object') {
                                 window.postIdsExibidos.unshift(postData[0].id);
                             }
+                            // Agora remove o editor e exibe o feed
+                            document.querySelector('.criar-postagem-container')?.remove();
+                            const feedContent = document.getElementById('feed-content');
+                            if (feedContent) feedContent.style.display = 'block';
                         });
                     });
+                } else {
+                    if (btnPublicar) {
+                        btnPublicar.disabled = false;
+                        btnPublicar.innerHTML = 'Publicar';
+                    }
                 }
             }
         };
