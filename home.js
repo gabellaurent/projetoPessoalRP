@@ -215,9 +215,10 @@ window.addEventListener('DOMContentLoaded', function() {
                     feedContent.style.display = 'block';
                     feedAtivo = true;
                 }
-                // Chama a função incremental para adicionar só novas postagens
-                const novosIds = await module.adicionarNovasPostagensFeed(postIdsExibidos);
-                postIdsExibidos = postIdsExibidos.concat(novosIds);
+                // Limpa o feed e carrega apenas os 15 últimos posts
+                if (module.renderPostagensFeed) {
+                    await module.renderPostagensFeed();
+                }
                 // Exibe o botão 'Carregar mais' apenas no menu 'Postagens Feed'
                 const btnCarregarMais = document.getElementById('btn-carregar-mais');
                 if (btnCarregarMais) btnCarregarMais.style.display = 'block';

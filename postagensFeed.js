@@ -112,6 +112,8 @@ export async function renderPostagensFeed() {
         fadeInElement(h1, 0);
         fadeInElement(p, 100);
     } else {
+        // Garante que posts estejam do mais novo para o mais antigo
+        posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         posts.forEach((post, idx) => {
             const h1 = document.createElement('h1');
             h1.textContent = post.titulo || 'titulo da postagem';
@@ -132,6 +134,15 @@ export async function renderPostagensFeed() {
                 btnCarregarMais.textContent = 'Carregar mais';
             }
             btnCarregarMais.onclick = async function() {
+                // Adiciona spinner
+                btnCarregarMais.disabled = true;
+                btnCarregarMais.innerHTML = '<span class="spinner" style="display:inline-block;width:18px;height:18px;border:3px solid #fff;border-top:3px solid #6366f1;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;"></span> Carregando...';
+                if (!document.getElementById('carregar-mais-spinner-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'carregar-mais-spinner-style';
+                    style.innerHTML = '@keyframes spin { 0% { transform: rotate(0deg);} 100% {transform: rotate(360deg);} }';
+                    document.head.appendChild(style);
+                }
                 // Busca mais postagens e adiciona ao final
                 let offset = feedContent.querySelectorAll('h1').length;
                 if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
@@ -139,10 +150,12 @@ export async function renderPostagensFeed() {
                         window.supabaseClient.load(async function(client) {
                             const { data, error } = await client
                                 .from('posts')
-                                .select('titulo, post_content')
+                                .select('titulo, post_content, created_at')
                                 .order('created_at', { ascending: false })
                                 .range(offset, offset + 14);
                             if (data && data.length > 0) {
+                                // Garante que posts estejam do mais novo para o mais antigo
+                                data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                                 data.forEach((post, idx) => {
                                     const h1 = document.createElement('h1');
                                     h1.textContent = post.titulo || 'titulo da postagem';
@@ -156,6 +169,9 @@ export async function renderPostagensFeed() {
                                 // Remove botão se não houver mais postagens
                                 if (data.length < 15) {
                                     btnCarregarMais.remove();
+                                } else {
+                                    btnCarregarMais.disabled = false;
+                                    btnCarregarMais.innerHTML = 'Carregar mais';
                                 }
                             } else {
                                 btnCarregarMais.remove();
@@ -163,6 +179,9 @@ export async function renderPostagensFeed() {
                             resolve();
                         });
                     });
+                } else {
+                    btnCarregarMais.disabled = false;
+                    btnCarregarMais.innerHTML = 'Carregar mais';
                 }
             };
             feedContent.appendChild(btnCarregarMais);
