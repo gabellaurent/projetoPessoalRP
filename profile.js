@@ -19,6 +19,7 @@ function formatarTexto(texto) {
 }
 
 function renderizarPerfilUsuario(author_id) {
+  // ...existing code...
   const mainContent = document.getElementById('main-content');
   if (!mainContent) return;
   mainContent.innerHTML = '<div id="perfil-loading" style="text-align:center;padding:32px;">Carregando perfil...</div>';
@@ -58,7 +59,19 @@ function renderizarPerfilUsuario(author_id) {
   const diffMs = hoje - dataCriacao;
   const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   html += `<div style="color:#888;font-size:1rem;margin-bottom:12px;text-align:center;">Conta criada em: ${formatarData(userData.created_at)} &bull; <span title='Dias desde a criação'>${diffDias} dias</span></div>`;
-    html += `<div style="margin-bottom:18px;color:white;text-align:center;"><strong>Bio:</strong><br><span style="color:white;">${formatarTexto(userData.bio || 'Nenhuma bio definida.')}</span></div>`;
+    // Verifica se é o próprio usuário
+    const usuarioLogadoId = window.supabaseClient?.currentUser?.id;
+    let bioHtml = `<strong>Bio:</strong><br><span style="color:white;">${formatarTexto(userData.bio || 'Nenhuma bio definida.')}</span>`;
+  // ...existing code...
+  if (usuarioLogadoId && usuarioLogadoId === userData.id) {
+      bioHtml += `<br><button id="btn-editar-bio" style="margin-top:8px;background:#6366f1;color:#fff;border:none;padding:6px 16px;border-radius:6px;font-size:1rem;cursor:pointer;">Editar Bio</button>`;
+      bioHtml += `<div id="editar-bio-area" style="display:none;margin-top:12px;">
+        <textarea id="bio-edit-textarea" style="width:90%;height:80px;border-radius:6px;padding:8px;">${userData.bio || ''}</textarea><br>
+        <button id="btn-salvar-bio" style="background:#43b581;color:#fff;border:none;padding:6px 16px;border-radius:6px;font-size:1rem;cursor:pointer;margin-top:6px;">Salvar</button>
+        <button id="btn-cancelar-bio" style="background:#888;color:#fff;border:none;padding:6px 16px;border-radius:6px;font-size:1rem;cursor:pointer;margin-top:6px;">Cancelar</button>
+      </div>`;
+    }
+    html += `<div style="margin-bottom:18px;color:white;text-align:center;">${bioHtml}</div>`;
   html += `<div style="display:flex;justify-content:center;gap:12px;margin-bottom:18px;">
     <button type="button" id="btn-publicacoes-usuario" style="background:#6366f1;color:#fff;border:none;padding:8px 0;border-radius:6px;font-size:1rem;cursor:pointer;width:150px;"><strong>Publicações:</strong> <span style="font-weight:bold;">${numPosts}</span></button>
     <button type="button" id="btn-personagens-usuario" style="background:#6366f1;color:#fff;border:none;padding:8px 0;border-radius:6px;font-size:1rem;cursor:pointer;width:150px;">Personagens</button>
@@ -79,6 +92,41 @@ function renderizarPerfilUsuario(author_id) {
     }
     html += '</div></div>';
     mainContent.innerHTML = html;
+    // Eventos para editar bio
+    if (usuarioLogadoId && usuarioLogadoId === userData.id) {
+      const btnEditarBio = document.getElementById('btn-editar-bio');
+      const editarBioArea = document.getElementById('editar-bio-area');
+      const btnSalvarBio = document.getElementById('btn-salvar-bio');
+      const btnCancelarBio = document.getElementById('btn-cancelar-bio');
+      const bioEditTextarea = document.getElementById('bio-edit-textarea');
+      if (btnEditarBio && editarBioArea && btnSalvarBio && btnCancelarBio && bioEditTextarea) {
+        btnEditarBio.onclick = function() {
+          editarBioArea.style.display = 'block';
+          btnEditarBio.style.display = 'none';
+        };
+        btnCancelarBio.onclick = function() {
+          editarBioArea.style.display = 'none';
+          btnEditarBio.style.display = 'inline-block';
+        };
+        btnSalvarBio.onclick = async function() {
+          const novaBio = bioEditTextarea.value;
+          btnSalvarBio.disabled = true;
+          btnSalvarBio.textContent = 'Salvando...';
+          // Atualiza bio no banco
+          const { error } = await window.supabaseClient._instance
+            .from('base_users')
+            .update({ bio: novaBio })
+            .eq('id', usuarioLogadoId);
+          btnSalvarBio.disabled = false;
+          btnSalvarBio.textContent = 'Salvar';
+          if (!error) {
+            renderizarPerfilUsuario(usuarioLogadoId);
+          } else {
+            alert('Erro ao salvar bio. Tente novamente.');
+          }
+        };
+      }
+    }
   });
 }
 

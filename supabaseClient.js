@@ -35,6 +35,25 @@
   window.supabaseClient = {
     load: loadSupabase,
     url: supabaseUrl,
-    key: supabaseKey
+    key: supabaseKey,
+    currentUser: null
   };
+
+  // Buscar usuário logado ao inicializar
+  function setCurrentUser() {
+    loadSupabase(function(client) {
+      if (client && client.auth && client.auth.getUser) {
+        client.auth.getUser().then(({ data }) => {
+          if (data && data.user) {
+            window.supabaseClient.currentUser = data.user;
+            console.log('Usuário logado carregado:', data.user);
+          } else {
+            window.supabaseClient.currentUser = null;
+            console.log('Nenhum usuário logado.');
+          }
+        });
+      }
+    });
+  }
+  setCurrentUser();
 })();
