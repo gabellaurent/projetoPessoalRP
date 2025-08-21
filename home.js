@@ -117,10 +117,10 @@ window.addEventListener('DOMContentLoaded', function() {
     let feedAtivo = true;
     let postIdsExibidos = [];
     import('./postagensFeed.js').then(module => {
-        // Carrega o feed inicial e salva os IDs exibidos
-        module.renderPostagensFeed();
-        showMainContentWhenReady();
-        posicionarBotaoCarregarMais();
+    // Carrega o feed inicial e salva os IDs exibidos
+    module.renderPostagensFeed();
+    showMainContentWhenReady();
+    posicionarBotaoCarregarMais();
 
     // Garante que o botão 'Carregar mais' só apareça no menu 'Postagens Feed'
     const btnCarregarMais = document.getElementById('btn-carregar-mais');
@@ -215,7 +215,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     feedContent.style.display = 'block';
                     feedAtivo = true;
                 }
-                // Limpa o feed e carrega apenas os 15 últimos posts
+                // Sempre re-renderiza o feed completo
                 if (module.renderPostagensFeed) {
                     await module.renderPostagensFeed();
                 }

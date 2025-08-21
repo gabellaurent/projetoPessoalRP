@@ -23,9 +23,9 @@ export function criarEditorPostagem(targetId) {
     const editorDiv = document.createElement('div');
     editorDiv.className = 'container criar-postagem-container fadein-post';
     editorDiv.innerHTML = `
-        <h2>Criar Postagem</h2>
+        
         <form id="postForm">
-            <input type="text" id="tituloPost" placeholder="Título da postagem" required style="width:100%;margin-bottom:10px;" />
+            <input type="text" id="tituloPost" placeholder="Título da postagem" required style="width:100%;background-color:transparent;margin-bottom:10px;font-size:2.2rem;font-weight:bold;border:none;outline:none;font-family:inherit;color:#fff;" />
             <div id="editor"></div>
             <button type="submit">Publicar</button>
         </form>
@@ -63,8 +63,6 @@ export function criarEditorPostagem(targetId) {
 
             const titulo = document.getElementById('tituloPost').value.trim();
             const conteudo = quill.root.innerHTML;
-
-            // Supondo que a uuid do usuário logado está disponível em window.userUUID
             const userUUID = window.userUUID;
             if (!userUUID) {
                 if (btnPublicar) {
@@ -74,7 +72,6 @@ export function criarEditorPostagem(targetId) {
                 return;
             }
 
-            // Usa o supabaseClient global
             let supabase = await new Promise((resolve, reject) => {
                 if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
                     window.supabaseClient.load(client => resolve(client));
@@ -83,7 +80,6 @@ export function criarEditorPostagem(targetId) {
                 }
             });
 
-            // Busca o username na tabela base-users
             const { data: userData, error: userError } = await supabase
                 .from('base_users')
                 .select('username')
@@ -97,11 +93,7 @@ export function criarEditorPostagem(targetId) {
                 return;
             }
             const author = userData.username;
-
-            // Data de criação
             const created_at = new Date().toISOString();
-
-            // Salva na tabela posts
             const { data: postData, error: postError } = await supabase
                 .from('posts')
                 .insert([
@@ -121,24 +113,23 @@ export function criarEditorPostagem(targetId) {
                 }
                 // Erro ao salvar postagem
             } else {
-                // Adiciona o novo post ao topo do feed e só remove o editor após garantir que foi carregado
-                if (postData && postData[0] && postData[0].id) {
-                    import('./postagensFeed.js').then(module => {
-                        module.adicionarNovasPostagensFeed([]).then(() => {
-                            // Opcional: adiciona o novo ID ao array global
-                            if (window.postIdsExibidos && typeof window.postIdsExibidos === 'object') {
-                                window.postIdsExibidos.unshift(postData[0].id);
+                // Remove o formulário e botão, exibe mensagem de sucesso com botão para carregar o feed
+                const editorContainer = document.querySelector('.criar-postagem-container');
+                if (editorContainer) {
+                    editorContainer.innerHTML = `
+                        <h2 style="color:#fff;">Postagem publicada, já se encontra disponível no 
+                            <button id="btn-ir-feed" style="background:#6366f1;color:#fff;border:none;padding:6px 18px;border-radius:6px;font-size:1rem;cursor:pointer;margin-left:6px;">Postagem Feed</button>
+                        </h2>
+                    `;
+                    const btnIrFeed = document.getElementById('btn-ir-feed');
+                    if (btnIrFeed) {
+                        btnIrFeed.onclick = function() {
+                            // Simula clique no botão da sidebar
+                            const btnSidebarFeed = document.getElementById('menu-feed');
+                            if (btnSidebarFeed) {
+                                btnSidebarFeed.click();
                             }
-                            // Agora remove o editor e exibe o feed
-                            document.querySelector('.criar-postagem-container')?.remove();
-                            const feedContent = document.getElementById('feed-content');
-                            if (feedContent) feedContent.style.display = 'block';
-                        });
-                    });
-                } else {
-                    if (btnPublicar) {
-                        btnPublicar.disabled = false;
-                        btnPublicar.innerHTML = 'Publicar';
+                        };
                     }
                 }
             }

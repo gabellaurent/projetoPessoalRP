@@ -9,43 +9,9 @@ export async function adicionarNovasPostagensFeed(postIdsExibidos = []) {
         feedContent.id = 'feed-content';
         mainContent.appendChild(feedContent);
     }
-    let novosPosts = [];
-    if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
-        await new Promise(resolve => {
-            window.supabaseClient.load(async function(client) {
-                const { data, error } = await client
-                    .from('posts')
-                    .select('id, titulo, post_content, created_at')
-                    .order('created_at', { ascending: false });
-                if (data && data.length > 0) {
-                    novosPosts = data.filter(post => !postIdsExibidos.includes(post.id));
-                }
-                resolve();
-            });
-        });
-    }
-    novosPosts.forEach((post, idx) => {
-        // Evita duplicação: verifica se já existe um h1 com o mesmo texto e um p com o mesmo conteúdo
-        const existeH1 = Array.from(feedContent.querySelectorAll('h1')).some(h => h.textContent === (post.titulo || 'titulo da postagem'));
-        const existeP = Array.from(feedContent.querySelectorAll('p')).some(pEl => pEl.innerHTML === (post.post_content || 'corpo da postagem'));
-        if (!existeH1 || !existeP) {
-            const h1 = document.createElement('h1');
-            h1.textContent = post.titulo || 'titulo da postagem';
-            const p = document.createElement('p');
-            p.innerHTML = post.post_content || 'corpo da postagem';
-            h1.classList.add('fadein-post');
-            p.classList.add('fadein-post');
-            // Insere no topo do feed
-            if (feedContent.firstChild) {
-                feedContent.insertBefore(p, feedContent.firstChild);
-                feedContent.insertBefore(h1, p);
-            } else {
-                feedContent.appendChild(h1);
-                feedContent.appendChild(p);
-            }
-        }
-    });
-    return novosPosts.map(post => post.id);
+    // Função desativada: use renderPostagensFeed para atualizar o feed principal
+    // Mantida apenas para compatibilidade, mas não faz nada
+    return [];
 }
 export async function renderPostagensFeed() {
     const mainContent = document.getElementById('main-content');
