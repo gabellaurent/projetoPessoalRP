@@ -63,8 +63,8 @@ function renderizarPerfilUsuario(author_id) {
       html += '<p>Este usuário ainda não fez nenhuma publicação.</p>';
     } else {
       postsData.forEach(post => {
-        html += `<div class="post-item" style="margin-bottom:32px;padding:18px 12px;border-radius:8px;background:#f7f7fa;box-shadow:0 2px 8px #0001;">`;
-        html += `<h3 style="font-size:1.1rem;font-weight:bold;margin-bottom:6px;">${post.titulo || 'Sem título'}</h3>`;
+    html += `<div class="post-item" style="margin-bottom:32px;padding:18px 12px;border-radius:8px;box-shadow:0 2px 8px #0001;">`;
+    html += `<h3 style="font-size:1.1rem;font-weight:bold;margin-bottom:6px;color:#5865F2;">${post.titulo || 'Sem título'}</h3>`;
         html += `<div style="color:#888;font-size:0.95rem;margin-bottom:8px;">${formatarData(post.created_at)}</div>`;
         html += `<div class="post-content">${formatarTexto(post.post_content || '')}</div>`;
         html += '</div>';
