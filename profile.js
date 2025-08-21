@@ -4,7 +4,7 @@
 function formatarData(dataStr) {
   if (!dataStr) return '';
   const d = new Date(dataStr);
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function formatarTexto(texto) {
@@ -27,7 +27,7 @@ function renderizarPerfilUsuario(author_id) {
     // Buscar dados do usuário
     const { data: userData, error: userError } = await client
       .from('base_users')
-      .select('id, email, bio, created_at')
+      .select('id, username, email, bio, created_at')
       .eq('id', author_id)
       .single();
 
@@ -47,8 +47,13 @@ function renderizarPerfilUsuario(author_id) {
       mainContent.innerHTML = html + '</div>';
       return;
     }
-    html += `<h1 style="font-size:2rem;font-weight:bold;">${userData.email.split('@')[0]}</h1>`;
-    html += `<div style="color:#888;font-size:1rem;margin-bottom:12px;">Conta criada em: ${formatarData(userData.created_at)}</div>`;
+  html += `<h1 style="font-size:2rem;font-weight:bold;">${userData.username || (userData.email ? userData.email.split('@')[0] : '')}</h1>`;
+  // Calcular dias desde a criação da conta
+  const dataCriacao = new Date(userData.created_at);
+  const hoje = new Date();
+  const diffMs = hoje - dataCriacao;
+  const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  html += `<div style="color:#888;font-size:1rem;margin-bottom:12px;">Conta criada em: ${formatarData(userData.created_at)} &bull; <span title='Dias desde a criação'>${diffDias} dias</span></div>`;
     html += `<div style="margin-bottom:18px;"><strong>Bio:</strong><br><span style="color:#444;">${formatarTexto(userData.bio || 'Nenhuma bio definida.')}</span></div>`;
     html += `<div style="margin-bottom:18px;"><strong>Mensagem pública:</strong><br><span style="color:#6366f1;">${formatarTexto(userData.bio || 'Nenhuma mensagem pública.')}</span></div>`;
     html += `<div style="margin-bottom:18px;"><strong>Publicações:</strong> <span style="font-weight:bold;">${numPosts}</span></div>`;
