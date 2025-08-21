@@ -56,7 +56,7 @@ function renderizarPerfilUsuario(author_id) {
   html += `<div style="color:#888;font-size:1rem;margin-bottom:12px;">Conta criada em: ${formatarData(userData.created_at)} &bull; <span title='Dias desde a criação'>${diffDias} dias</span></div>`;
     html += `<div style="margin-bottom:18px;"><strong>Bio:</strong><br><span style="color:#444;">${formatarTexto(userData.bio || 'Nenhuma bio definida.')}</span></div>`;
     html += `<div style="margin-bottom:18px;"><strong>Mensagem pública:</strong><br><span style="color:#6366f1;">${formatarTexto(userData.bio || 'Nenhuma mensagem pública.')}</span></div>`;
-    html += `<div style="margin-bottom:18px;"><strong>Publicações:</strong> <span style="font-weight:bold;">${numPosts}</span></div>`;
+  html += `<button type="button" id="btn-publicacoes-usuario" style="margin-bottom:18px;display:block;background:#6366f1;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:1rem;cursor:pointer;"><strong>Publicações:</strong> <span style="font-weight:bold;">${numPosts}</span></button>`;
     html += '<hr style="margin:24px 0;">';
     html += '<div><h2 style="font-size:1.3rem;margin-bottom:12px;">Publicações do usuário</h2>';
     if (numPosts === 0) {

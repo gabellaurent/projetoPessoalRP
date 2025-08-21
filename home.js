@@ -154,6 +154,13 @@ window.addEventListener('DOMContentLoaded', function() {
         if (btnCriarPostagem) {
             btnCriarPostagem.addEventListener('click', function(e) {
                 e.preventDefault();
+                    // Remove perfil do main-content se estiver presente
+                    const mainContent = document.getElementById('main-content');
+                    if (mainContent) {
+                        // Remove perfil-area se existir
+                        const perfilArea = mainContent.querySelector('.perfil-area');
+                        if (perfilArea) perfilArea.remove();
+                    }
                 removeCriarPostagem();
                 const feedContent = document.getElementById('feed-content');
                 if (feedContent) feedContent.style.display = 'none';
