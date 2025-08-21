@@ -156,6 +156,11 @@
   position: relative;
 }
 
+/* Padroniza cor dos títulos h2 no feed e perfil */
+#feed-content h2, .main-content h2 {
+  color: #ffffff;
+}
+
 /* For loader inside main-content, override to absolute and 100% width/height */
 .main-content .loader {
   position: absolute;
