@@ -119,7 +119,7 @@ export async function renderPostagensFeed() {
             feedContent.appendChild(postDiv);
         });
         // Adiciona botão 'Carregar mais' se houver mais postagens
-        if (totalPosts > posts.length) {
+            // Mostra o botão se houver mais postagens para carregar
             let btnCarregarMais = document.getElementById('btn-carregar-mais');
             if (!btnCarregarMais) {
                 btnCarregarMais = document.createElement('button');
@@ -127,8 +127,8 @@ export async function renderPostagensFeed() {
                 btnCarregarMais.className = 'btn-carregar-mais';
                 btnCarregarMais.textContent = 'Carregar mais';
             }
+            btnCarregarMais.style.display = (totalPosts > feedContent.querySelectorAll('.post-item').length) ? 'block' : 'none';
             btnCarregarMais.onclick = async function() {
-                // Adiciona spinner
                 btnCarregarMais.disabled = true;
                 btnCarregarMais.innerHTML = '<span class="spinner" style="display:inline-block;width:18px;height:18px;border:3px solid #fff;border-top:3px solid #6366f1;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;"></span> Carregando...';
                 if (!document.getElementById('carregar-mais-spinner-style')) {
@@ -137,74 +137,68 @@ export async function renderPostagensFeed() {
                     style.innerHTML = '@keyframes spin { 0% { transform: rotate(0deg);} 100% {transform: rotate(360deg);} }';
                     document.head.appendChild(style);
                 }
-                // Busca mais postagens e adiciona ao final
                 let offset = feedContent.querySelectorAll('.post-item').length;
+                let novosPosts = [];
                 if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
                     await new Promise(resolve => {
                         window.supabaseClient.load(async function(client) {
                             const { data, error } = await client
                                 .from('posts')
-                                .select('titulo, post_content, created_at')
+                                .select('titulo, post_content, author, created_at')
                                 .order('created_at', { ascending: false })
-                                .range(offset, offset + 14);
+                                .range(offset, offset + 4); // 5 itens por vez
                             if (data && data.length > 0) {
-                                // Garante que posts estejam do mais novo para o mais antigo
-                                data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                                data.forEach((post, idx) => {
-                                    const postDiv = document.createElement('div');
-                                    postDiv.className = 'post-item fadein-post';
-                                    postDiv.style.animationDelay = ((offset + idx) * 100) + 'ms';
-
-                                    const h1 = document.createElement('h1');
-                                    h1.classList.add('fadein-post');
-                                    h1.style.animationDelay = ((offset + idx) * 100) + 'ms';
-                                    let dataFormatada = '';
-                                    if (post.created_at) {
-                                        const d = new Date(post.created_at);
-                                        const hoje = new Date();
-                                        const ontem = new Date();
-                                        ontem.setDate(hoje.getDate() - 1);
-                                        function isSameDay(a, b) {
-                                            return a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
-                                        }
-                                        if (isSameDay(d, hoje)) {
-                                            dataFormatada = `Hoje, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-                                        } else if (isSameDay(d, ontem)) {
-                                            dataFormatada = `Ontem, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-                                        } else {
-                                            dataFormatada = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                                        }
-                                    }
-                                    h1.innerHTML = `<span style="font-weight:bold;">${post.titulo || 'titulo da postagem'}</span> <span style="font-size:0.9rem;color:#bbb;margin-left:12px;">por <a href="#" class="user-link" style="color:#8ab4f8;text-decoration:underline;">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
-
-                                    const contentDiv = document.createElement('div');
-                                    contentDiv.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
-                                    contentDiv.classList.add('fadein-post', 'post-content');
-                                    contentDiv.style.animationDelay = ((offset + idx) * 100 + 50) + 'ms';
-
-                                    postDiv.appendChild(h1);
-                                    postDiv.appendChild(contentDiv);
-                                    feedContent.appendChild(postDiv);
-                                });
-                                // Remove botão se não houver mais postagens
-                                if (data.length < 15) {
-                                    btnCarregarMais.remove();
-                                } else {
-                                    btnCarregarMais.disabled = false;
-                                    btnCarregarMais.innerHTML = 'Carregar mais';
-                                }
-                            } else {
-                                btnCarregarMais.remove();
+                                novosPosts = data;
                             }
                             resolve();
                         });
                     });
-                } else {
-                    btnCarregarMais.disabled = false;
-                    btnCarregarMais.innerHTML = 'Carregar mais';
+                }
+                novosPosts.forEach((post, idx) => {
+                    const postDiv = document.createElement('div');
+                    postDiv.className = 'post-item fadein-post';
+                    postDiv.style.animationDelay = ((offset + idx) * 100) + 'ms';
+                    const h1 = document.createElement('h1');
+                    h1.classList.add('fadein-post');
+                    h1.style.animationDelay = ((offset + idx) * 100) + 'ms';
+                    let dataFormatada = '';
+                    if (post.created_at) {
+                        const d = new Date(post.created_at);
+                        const hoje = new Date();
+                        const ontem = new Date();
+                        ontem.setDate(hoje.getDate() - 1);
+                        function isSameDay(a, b) {
+                            return a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
+                        }
+                        if (isSameDay(d, hoje)) {
+                            dataFormatada = `Hoje, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+                        } else if (isSameDay(d, ontem)) {
+                            dataFormatada = `Ontem, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+                        } else {
+                            dataFormatada = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                        }
+                    }
+                    h1.innerHTML = `<span style=\"font-weight:bold;\">${post.titulo || 'titulo da postagem'}</span> <span style=\"font-size:0.9rem;color:#bbb;margin-left:12px;\">por <a href=\"#\" class=\"user-link\" style=\"color:#8ab4f8;text-decoration:underline;\">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
+                    const contentDiv = document.createElement('div');
+                    contentDiv.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
+                    contentDiv.classList.add('fadein-post', 'post-content');
+                    contentDiv.style.animationDelay = ((offset + idx) * 100 + 50) + 'ms';
+                    postDiv.appendChild(h1);
+                    postDiv.appendChild(contentDiv);
+                    // Insere acima do botão 'Carregar mais'
+                    if (btnCarregarMais && btnCarregarMais.parentNode === feedContent) {
+                        feedContent.insertBefore(postDiv, btnCarregarMais);
+                    } else {
+                        feedContent.appendChild(postDiv);
+                    }
+                });
+                // Atualiza visibilidade do botão
+                btnCarregarMais.disabled = false;
+                btnCarregarMais.innerHTML = 'Carregar mais';
+                if ((offset + novosPosts.length) >= totalPosts || novosPosts.length === 0) {
+                    btnCarregarMais.style.display = 'none';
                 }
             };
             feedContent.appendChild(btnCarregarMais);
-        }
     }
 }
