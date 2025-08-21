@@ -30,7 +30,7 @@ export async function renderPostagensFeed() {
             window.supabaseClient.load(async function(client) {
                 const { data, count, error } = await client
                     .from('posts')
-                    .select('titulo, post_content, author, created_at', { count: 'exact' })
+                    .select('titulo, post_content, author, author_id, created_at', { count: 'exact' })
                     .order('created_at', { ascending: false })
                     .limit(15);
                 if (data && data.length > 0) {
@@ -107,7 +107,7 @@ export async function renderPostagensFeed() {
                 }
             }
             // Monta título estilo Reddit
-            h1.innerHTML = `<span style="font-weight:bold;">${post.titulo || 'titulo da postagem'}</span> <span style="font-size:0.9rem;color:#bbb;margin-left:12px;">por <a href="#" class="user-link" style="color:#8ab4f8;text-decoration:underline;">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
+            h1.innerHTML = `<span style="font-weight:bold;">${post.titulo || 'titulo da postagem'}</span> <span style="font-size:0.9rem;color:#bbb;margin-left:12px;">por <a href="#" class="user-link" style="color:#8ab4f8;text-decoration:underline;" data-userid="${post.author_id}">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
 
             const contentDiv = document.createElement('div');
             contentDiv.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
@@ -144,7 +144,7 @@ export async function renderPostagensFeed() {
                         window.supabaseClient.load(async function(client) {
                             const { data, error } = await client
                                 .from('posts')
-                                .select('titulo, post_content, author, created_at')
+                                .select('titulo, post_content, author, author_id, created_at')
                                 .order('created_at', { ascending: false })
                                 .range(offset, offset + 4); // 5 itens por vez
                             if (data && data.length > 0) {
@@ -178,7 +178,7 @@ export async function renderPostagensFeed() {
                             dataFormatada = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
                         }
                     }
-                    h1.innerHTML = `<span style=\"font-weight:bold;\">${post.titulo || 'titulo da postagem'}</span> <span style=\"font-size:0.9rem;color:#bbb;margin-left:12px;\">por <a href=\"#\" class=\"user-link\" style=\"color:#8ab4f8;text-decoration:underline;\">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
+                    h1.innerHTML = `<span style=\"font-weight:bold;\">${post.titulo || 'titulo da postagem'}</span> <span style=\"font-size:0.9rem;color:#bbb;margin-left:12px;\">por <a href=\"#\" class=\"user-link\" style=\"color:#8ab4f8;text-decoration:underline;\" data-userid=\"${post.author_id}\">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
                     const contentDiv = document.createElement('div');
                     contentDiv.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
                     contentDiv.classList.add('fadein-post', 'post-content');
