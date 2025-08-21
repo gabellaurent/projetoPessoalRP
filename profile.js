@@ -50,7 +50,7 @@ function renderizarPerfilUsuario(author_id) {
   // Gerar iniciais do usuário
   let nomeBase = userData.username || (userData.email ? userData.email.split('@')[0] : '');
   let iniciais = nomeBase.split(/\s+/).map(p => p[0]).join('').toUpperCase().slice(0,2);
-  html += `<div style="width:64px;height:64px;border-radius:50%;background:#6366f1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;margin:0 auto 16px auto;">${iniciais}</div>`;
+  html += `<div style="width:128px;height:128px;border-radius:50%;background:#6366f1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:4rem;font-weight:bold;margin:0 auto 24px auto;">${iniciais}</div>`;
   html += `<h1 style="font-size:2rem;font-weight:bold;text-align:center;">${nomeBase}</h1>`;
   // Calcular dias desde a criação da conta
   const dataCriacao = new Date(userData.created_at);
