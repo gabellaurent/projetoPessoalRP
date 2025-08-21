@@ -48,7 +48,9 @@ window.addEventListener('DOMContentLoaded', function() {
                     .single();
                 if (data && data.username) {
                     const profileUsername = document.getElementById('profile-username');
-                    if (profileUsername) profileUsername.textContent = data.username;
+                        if (profileUsername) {
+                            profileUsername.innerHTML = `<a href="#" class="user-link" data-userid="${userUUID}" style="color:inherit;text-decoration:underline;">${data.username}</a>`;
+                        }
                 }
             }
         });
