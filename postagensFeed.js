@@ -30,7 +30,7 @@ export async function renderPostagensFeed() {
             window.supabaseClient.load(async function(client) {
                 const { data, count, error } = await client
                     .from('posts')
-                    .select('titulo, post_content', { count: 'exact' })
+                    .select('titulo, post_content, author, created_at', { count: 'exact' })
                     .order('created_at', { ascending: false })
                     .limit(15);
                 if (data && data.length > 0) {
@@ -81,14 +81,42 @@ export async function renderPostagensFeed() {
         // Garante que posts estejam do mais novo para o mais antigo
         posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         posts.forEach((post, idx) => {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post-item fadein-post';
+            postDiv.style.animationDelay = (idx * 100) + 'ms';
+
             const h1 = document.createElement('h1');
-            h1.textContent = post.titulo || 'titulo da postagem';
-            const p = document.createElement('p');
-            p.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
-            feedContent.appendChild(h1);
-            feedContent.appendChild(p);
-            fadeInElement(h1, idx * 100);
-            fadeInElement(p, idx * 100 + 50);
+            h1.classList.add('fadein-post');
+            h1.style.animationDelay = (idx * 100) + 'ms';
+            // Formata data
+            let dataFormatada = '';
+            if (post.created_at) {
+                const d = new Date(post.created_at);
+                const hoje = new Date();
+                const ontem = new Date();
+                ontem.setDate(hoje.getDate() - 1);
+                function isSameDay(a, b) {
+                    return a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
+                }
+                if (isSameDay(d, hoje)) {
+                    dataFormatada = `Hoje, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+                } else if (isSameDay(d, ontem)) {
+                    dataFormatada = `Ontem, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+                } else {
+                    dataFormatada = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                }
+            }
+            // Monta título estilo Reddit
+            h1.innerHTML = `<span style="font-weight:bold;">${post.titulo || 'titulo da postagem'}</span> <span style="font-size:0.9rem;color:#bbb;margin-left:12px;">por <a href="#" class="user-link" style="color:#8ab4f8;text-decoration:underline;">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
+            contentDiv.classList.add('fadein-post', 'post-content');
+            contentDiv.style.animationDelay = (idx * 100 + 50) + 'ms';
+
+            postDiv.appendChild(h1);
+            postDiv.appendChild(contentDiv);
+            feedContent.appendChild(postDiv);
         });
         // Adiciona botão 'Carregar mais' se houver mais postagens
         if (totalPosts > posts.length) {
@@ -110,7 +138,7 @@ export async function renderPostagensFeed() {
                     document.head.appendChild(style);
                 }
                 // Busca mais postagens e adiciona ao final
-                let offset = feedContent.querySelectorAll('h1').length;
+                let offset = feedContent.querySelectorAll('.post-item').length;
                 if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
                     await new Promise(resolve => {
                         window.supabaseClient.load(async function(client) {
@@ -123,14 +151,40 @@ export async function renderPostagensFeed() {
                                 // Garante que posts estejam do mais novo para o mais antigo
                                 data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                                 data.forEach((post, idx) => {
+                                    const postDiv = document.createElement('div');
+                                    postDiv.className = 'post-item fadein-post';
+                                    postDiv.style.animationDelay = ((offset + idx) * 100) + 'ms';
+
                                     const h1 = document.createElement('h1');
-                                    h1.textContent = post.titulo || 'titulo da postagem';
-                                    const p = document.createElement('p');
-                                    p.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
-                                    feedContent.appendChild(h1);
-                                    feedContent.appendChild(p);
-                                    fadeInElement(h1, (offset + idx) * 100);
-                                    fadeInElement(p, (offset + idx) * 100 + 50);
+                                    h1.classList.add('fadein-post');
+                                    h1.style.animationDelay = ((offset + idx) * 100) + 'ms';
+                                    let dataFormatada = '';
+                                    if (post.created_at) {
+                                        const d = new Date(post.created_at);
+                                        const hoje = new Date();
+                                        const ontem = new Date();
+                                        ontem.setDate(hoje.getDate() - 1);
+                                        function isSameDay(a, b) {
+                                            return a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
+                                        }
+                                        if (isSameDay(d, hoje)) {
+                                            dataFormatada = `Hoje, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+                                        } else if (isSameDay(d, ontem)) {
+                                            dataFormatada = `Ontem, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+                                        } else {
+                                            dataFormatada = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                                        }
+                                    }
+                                    h1.innerHTML = `<span style="font-weight:bold;">${post.titulo || 'titulo da postagem'}</span> <span style="font-size:0.9rem;color:#bbb;margin-left:12px;">por <a href="#" class="user-link" style="color:#8ab4f8;text-decoration:underline;">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
+
+                                    const contentDiv = document.createElement('div');
+                                    contentDiv.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
+                                    contentDiv.classList.add('fadein-post', 'post-content');
+                                    contentDiv.style.animationDelay = ((offset + idx) * 100 + 50) + 'ms';
+
+                                    postDiv.appendChild(h1);
+                                    postDiv.appendChild(contentDiv);
+                                    feedContent.appendChild(postDiv);
                                 });
                                 // Remove botão se não houver mais postagens
                                 if (data.length < 15) {

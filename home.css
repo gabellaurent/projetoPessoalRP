@@ -423,4 +423,10 @@ h1{
     text-decoration: underline;
     font-size: 1.05rem;
 }
+.post-item {
+  transition: background 0.1s;
+}
+.post-item:hover {
+  background: rgba(211, 213, 255, 0.08); /* cor leve, similar ao azul do botão */
+}
 
