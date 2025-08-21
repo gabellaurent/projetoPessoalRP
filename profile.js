@@ -47,15 +47,23 @@ function renderizarPerfilUsuario(author_id) {
       mainContent.innerHTML = html + '</div>';
       return;
     }
-  html += `<h1 style="font-size:2rem;font-weight:bold;">${userData.username || (userData.email ? userData.email.split('@')[0] : '')}</h1>`;
+  // Gerar iniciais do usuário
+  let nomeBase = userData.username || (userData.email ? userData.email.split('@')[0] : '');
+  let iniciais = nomeBase.split(/\s+/).map(p => p[0]).join('').toUpperCase().slice(0,2);
+  html += `<div style="width:64px;height:64px;border-radius:50%;background:#6366f1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;margin:0 auto 16px auto;">${iniciais}</div>`;
+  html += `<h1 style="font-size:2rem;font-weight:bold;text-align:center;">${nomeBase}</h1>`;
   // Calcular dias desde a criação da conta
   const dataCriacao = new Date(userData.created_at);
   const hoje = new Date();
   const diffMs = hoje - dataCriacao;
   const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  html += `<div style="color:#888;font-size:1rem;margin-bottom:12px;">Conta criada em: ${formatarData(userData.created_at)} &bull; <span title='Dias desde a criação'>${diffDias} dias</span></div>`;
-    html += `<div style="margin-bottom:18px;color:white;"><strong>Bio:</strong><br><span style="color:white;">${formatarTexto(userData.bio || 'Nenhuma bio definida.')}</span></div>`;
-  html += `<button type="button" id="btn-publicacoes-usuario" style="margin-bottom:18px;display:block;background:#6366f1;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:1rem;cursor:pointer;"><strong>Publicações:</strong> <span style="font-weight:bold;">${numPosts}</span></button>`;
+  html += `<div style="color:#888;font-size:1rem;margin-bottom:12px;text-align:center;">Conta criada em: ${formatarData(userData.created_at)} &bull; <span title='Dias desde a criação'>${diffDias} dias</span></div>`;
+    html += `<div style="margin-bottom:18px;color:white;text-align:center;"><strong>Bio:</strong><br><span style="color:white;">${formatarTexto(userData.bio || 'Nenhuma bio definida.')}</span></div>`;
+  html += `<div style="display:flex;justify-content:center;gap:12px;margin-bottom:18px;">
+    <button type="button" id="btn-publicacoes-usuario" style="background:#6366f1;color:#fff;border:none;padding:8px 0;border-radius:6px;font-size:1rem;cursor:pointer;width:150px;"><strong>Publicações:</strong> <span style="font-weight:bold;">${numPosts}</span></button>
+    <button type="button" id="btn-personagens-usuario" style="background:#6366f1;color:#fff;border:none;padding:8px 0;border-radius:6px;font-size:1rem;cursor:pointer;width:150px;">Personagens</button>
+    <button type="button" id="btn-plots-usuario" style="background:#6366f1;color:#fff;border:none;padding:8px 0;border-radius:6px;font-size:1rem;cursor:pointer;width:150px;">Plots</button>
+  </div>`;
     html += '<hr style="margin:24px 0;">';
     html += '<div><h2 style="font-size:1.3rem;margin-bottom:12px;">Publicações do usuário</h2>';
     if (numPosts === 0) {
