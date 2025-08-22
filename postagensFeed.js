@@ -30,7 +30,7 @@ export async function renderPostagensFeed() {
             window.supabaseClient.load(async function(client) {
                 const { data, count, error } = await client
                     .from('posts')
-                    .select('titulo, post_content, author, author_id, created_at', { count: 'exact' })
+                    .select('id, titulo, post_content, author, author_id, created_at', { count: 'exact' })
                     .order('created_at', { ascending: false })
                     .limit(15);
                 if (data && data.length > 0) {
@@ -182,11 +182,56 @@ export async function renderPostagensFeed() {
             // Contador de curtidas
             const likesCount = document.createElement('span');
             likesCount.className = 'likes-count';
-            likesCount.textContent = post.likes || '0';
+            likesCount.textContent = '0';
             likesCount.style.marginLeft = '6px';
             likesCount.style.fontWeight = 'bold';
             likesCount.style.color = '#e25555';
             btnCurtir.appendChild(likesCount);
+
+            // Consulta quantidade de likes na tabela likes
+            window.supabaseClient.load(async function(client) {
+                const { count, error } = await client
+                    .from('likes')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('post_id', post.id);
+                if (!error && typeof count === 'number') {
+                    likesCount.textContent = count.toString();
+                }
+            });
+
+            // Integração com likes.js
+            import('./likes.js').then(({ addLike, removeLike, hasLiked }) => {
+                let liked = false;
+                let user_id = window.supabaseClient?.currentUser?.id;
+                let post_id = post.id;
+                // Verifica se o usuário já curtiu
+                if (user_id && post_id) {
+                    hasLiked(user_id, post_id).then(res => {
+                        liked = res.liked;
+                        if (liked) btnCurtir.classList.add('liked');
+                    });
+                }
+                btnCurtir.addEventListener('click', async () => {
+                    if (!user_id || !post_id) {
+                        return;
+                    }
+                    if (!liked) {
+                        const { error } = await addLike(user_id, post_id);
+                        if (!error) {
+                            liked = true;
+                            btnCurtir.classList.add('liked');
+                            likesCount.textContent = (parseInt(likesCount.textContent) + 1).toString();
+                        }
+                    } else {
+                        const { error } = await removeLike(user_id, post_id);
+                        if (!error) {
+                            liked = false;
+                            btnCurtir.classList.remove('liked');
+                            likesCount.textContent = (parseInt(likesCount.textContent) - 1).toString();
+                        }
+                    }
+                });
+            });
             // Botão comentar com ícone e contador
             const btnComentar = document.createElement('button');
             btnComentar.className = 'btn-comentar';
