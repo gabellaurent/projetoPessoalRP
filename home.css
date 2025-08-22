@@ -1,3 +1,11 @@
+/* Limite de largura para o corpo da postagem */
+.postBody {
+  max-height: 400px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow: hidden;
+}
 /* Fade-in para postagens do feed */
 .fadein-post {
     opacity: 0;
@@ -431,7 +439,5 @@ h1{
 .post-item {
   transition: background 0.1s;
 }
-.post-item:hover {
-  background: rgba(211, 213, 255, 0.08); /* cor leve, similar ao azul do botão */
-}
+
 

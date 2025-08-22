@@ -84,8 +84,8 @@ export async function renderPostagensFeed() {
             const postDiv = document.createElement('div');
             postDiv.className = 'post-item fadein-post';
             postDiv.style.animationDelay = (idx * 100) + 'ms';
-            postDiv.style.maxHeight = '600px';
-            postDiv.style.overflow = 'hidden';
+            // postDiv.style.maxHeight = '600px';
+            // postDiv.style.overflow = 'hidden';
 
             const h1 = document.createElement('h1');
             h1.classList.add('fadein-post');
@@ -111,19 +111,56 @@ export async function renderPostagensFeed() {
             // Monta título estilo Reddit
             h1.innerHTML = `<span style="font-weight:bold;">${post.titulo || 'titulo da postagem'}</span> <span style="font-size:0.9rem;color:#bbb;margin-left:12px;">por <a href="#" class="user-link" style="color:#8ab4f8;text-decoration:underline;" data-userid="${post.author_id}">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
 
+            const postBodyDiv = document.createElement('div');
+            postBodyDiv.className = 'postBody';
             const contentDiv = document.createElement('div');
             contentDiv.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
             contentDiv.classList.add('fadein-post', 'post-content');
             contentDiv.style.animationDelay = (idx * 100 + 50) + 'ms';
+            postBodyDiv.appendChild(contentDiv);
 
             postDiv.appendChild(h1);
-            postDiv.appendChild(contentDiv);
-            // Linha de divisão
-            const divider = document.createElement('hr');
-            divider.style.margin = '16px 0 8px 0';
-            divider.style.border = 'none';
-            divider.style.borderTop = '1px solid #2d3b49';
-            postDiv.appendChild(divider);
+            postDiv.appendChild(postBodyDiv);
+            // Adiciona botão 'Exibir mais' se o conteúdo exceder o max-height
+            setTimeout(() => {
+                if (contentDiv.scrollHeight > postBodyDiv.clientHeight) {
+                    // Adiciona gradiente
+                    postBodyDiv.style.position = 'relative';
+                    const gradiente = document.createElement('div');
+                    gradiente.className = 'postBody-gradient';
+                    gradiente.style.position = 'absolute';
+                    gradiente.style.left = '0';
+                    gradiente.style.right = '0';
+                    gradiente.style.bottom = '0';
+                    gradiente.style.height = '300px';
+                    gradiente.style.pointerEvents = 'none';
+                    gradiente.style.background = 'linear-gradient(to bottom, rgba(35,39,47,0), #23272F 90%)';
+                    gradiente.style.borderRadius = 'inherit';
+                    gradiente.style.zIndex = '2';
+                    postBodyDiv.appendChild(gradiente);
+
+                    const btnExibirMais = document.createElement('button');
+                    btnExibirMais.className = 'btn-exibir-mais';
+                    btnExibirMais.textContent = 'Exibir mais';
+                    btnExibirMais.style.display = 'block';
+                    btnExibirMais.style.margin = '8px auto';
+                    btnExibirMais.style.padding = '6px 18px';
+                    btnExibirMais.style.borderRadius = '8px';
+                    btnExibirMais.style.background = '#353942';
+                    btnExibirMais.style.color = '#b8c7d1';
+                    btnExibirMais.style.fontWeight = '600';
+                    btnExibirMais.style.border = 'none';
+                    btnExibirMais.style.cursor = 'pointer';
+                    btnExibirMais.style.zIndex = '3';
+                    btnExibirMais.onclick = function() {
+                        postBodyDiv.style.maxHeight = 'none';
+                        btnExibirMais.style.display = 'none';
+                        if (gradiente && gradiente.parentNode) gradiente.parentNode.removeChild(gradiente);
+                    };
+                    postBodyDiv.parentNode.insertBefore(btnExibirMais, actionsDiv);
+                }
+            }, 0);
+            // ...removido HR antes dos botões...
             // Botões de curtir e comentar
             const actionsDiv = document.createElement('div');
             actionsDiv.style.display = 'flex';
@@ -173,6 +210,12 @@ export async function renderPostagensFeed() {
             actionsDiv.appendChild(btnCurtir);
             actionsDiv.appendChild(btnComentar);
             postDiv.appendChild(actionsDiv);
+            // Novo HR após os botões de ação
+            const hrAcoes = document.createElement('hr');
+            hrAcoes.style.margin = '8px 0 16px 0';
+            hrAcoes.style.border = 'none';
+            hrAcoes.style.borderTop = '1px solid #2d3b49';
+            postDiv.appendChild(hrAcoes);
             feedContent.appendChild(postDiv);
         });
         // Adiciona botão 'Carregar mais' se houver mais postagens
@@ -215,8 +258,8 @@ export async function renderPostagensFeed() {
                     const postDiv = document.createElement('div');
                     postDiv.className = 'post-item fadein-post';
                     postDiv.style.animationDelay = ((offset + idx) * 100) + 'ms';
-                    postDiv.style.maxHeight = '600px';
-                    postDiv.style.overflow = 'hidden';
+                    // postDiv.style.maxHeight = '600px';
+                    // postDiv.style.overflow = 'hidden';
                     const h1 = document.createElement('h1');
                     h1.classList.add('fadein-post');
                     h1.style.animationDelay = ((offset + idx) * 100) + 'ms';
@@ -238,18 +281,54 @@ export async function renderPostagensFeed() {
                         }
                     }
                     h1.innerHTML = `<span style=\"font-weight:bold;\">${post.titulo || 'titulo da postagem'}</span> <span style=\"font-size:0.9rem;color:#bbb;margin-left:12px;\">por <a href=\"#\" class=\"user-link\" style=\"color:#8ab4f8;text-decoration:underline;\" data-userid=\"${post.author_id}\">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
+                    const postBodyDiv = document.createElement('div');
+                    postBodyDiv.className = 'postBody';
                     const contentDiv = document.createElement('div');
                     contentDiv.innerHTML = formatarTexto(post.post_content || 'corpo da postagem');
                     contentDiv.classList.add('fadein-post', 'post-content');
                     contentDiv.style.animationDelay = ((offset + idx) * 100 + 50) + 'ms';
+                    postBodyDiv.appendChild(contentDiv);
                     postDiv.appendChild(h1);
-                    postDiv.appendChild(contentDiv);
-                    // Linha de divisão
-                    const divider = document.createElement('hr');
-                    divider.style.margin = '16px 0 8px 0';
-                    divider.style.border = 'none';
-                    divider.style.borderTop = '1px solid #2d3b49';
-                    postDiv.appendChild(divider);
+                    postDiv.appendChild(postBodyDiv);
+                    // Adiciona botão 'Exibir mais' se o conteúdo exceder o max-height
+                    setTimeout(() => {
+                        if (contentDiv.scrollHeight > postBodyDiv.clientHeight) {
+                            postBodyDiv.style.position = 'relative';
+                            const gradiente = document.createElement('div');
+                            gradiente.className = 'postBody-gradient';
+                            gradiente.style.position = 'absolute';
+                            gradiente.style.left = '0';
+                            gradiente.style.right = '0';
+                            gradiente.style.bottom = '0';
+                            gradiente.style.height = '300px';
+                            gradiente.style.pointerEvents = 'none';
+                            gradiente.style.background = 'linear-gradient(to bottom, rgba(35,39,47,0), #23272F 90%)';
+                            gradiente.style.borderRadius = 'inherit';
+                            gradiente.style.zIndex = '2';
+                            postBodyDiv.appendChild(gradiente);
+
+                            const btnExibirMais = document.createElement('button');
+                            btnExibirMais.className = 'btn-exibir-mais';
+                            btnExibirMais.textContent = 'Exibir mais';
+                            btnExibirMais.style.display = 'block';
+                            btnExibirMais.style.margin = '8px auto';
+                            btnExibirMais.style.padding = '6px 18px';
+                            btnExibirMais.style.borderRadius = '8px';
+                            btnExibirMais.style.background = '#353942';
+                            btnExibirMais.style.color = '#b8c7d1';
+                            btnExibirMais.style.fontWeight = '600';
+                            btnExibirMais.style.border = 'none';
+                            btnExibirMais.style.cursor = 'pointer';
+                            btnExibirMais.style.zIndex = '3';
+                            btnExibirMais.onclick = function() {
+                                postBodyDiv.style.maxHeight = 'none';
+                                btnExibirMais.style.display = 'none';
+                                if (gradiente && gradiente.parentNode) gradiente.parentNode.removeChild(gradiente);
+                            };
+                            postBodyDiv.parentNode.insertBefore(btnExibirMais, actionsDiv);
+                        }
+                    }, 0);
+                    // ...removido HR antes dos botões...
                     // Botões de curtir e comentar
                     const actionsDiv = document.createElement('div');
                     actionsDiv.style.display = 'flex';
@@ -299,6 +378,12 @@ export async function renderPostagensFeed() {
                     actionsDiv.appendChild(btnCurtir);
                     actionsDiv.appendChild(btnComentar);
                     postDiv.appendChild(actionsDiv);
+                    // Novo HR após os botões de ação
+                    const hrAcoes = document.createElement('hr');
+                    hrAcoes.style.margin = '8px 0 16px 0';
+                    hrAcoes.style.border = 'none';
+                    hrAcoes.style.borderTop = '1px solid #2d3b49';
+                    postDiv.appendChild(hrAcoes);
                     // Insere acima do botão 'Carregar mais'
                     if (btnCarregarMais && btnCarregarMais.parentNode === feedContent) {
                         feedContent.insertBefore(postDiv, btnCarregarMais);
