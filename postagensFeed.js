@@ -247,11 +247,43 @@ export async function renderPostagensFeed() {
             // Contador de comentários
             const commentsCount = document.createElement('span');
             commentsCount.className = 'comments-count';
-            commentsCount.textContent = post.comments || '0';
+            commentsCount.textContent = '...'; // Carregando
             commentsCount.style.marginLeft = '6px';
             commentsCount.style.fontWeight = 'bold';
             commentsCount.style.color = '#6366f1';
             btnComentar.appendChild(commentsCount);
+            // Buscar quantidade real de comentários
+            window.supabaseClient.load(async function(client) {
+                const updateCount = async () => {
+                    const { count, error } = await client
+                        .from('comentarios_posts')
+                        .select('id', { count: 'exact', head: true })
+                        .eq('post_id', post.id);
+                    if (!error && typeof count === 'number') {
+                        commentsCount.textContent = count.toString();
+                    } else {
+                        commentsCount.textContent = '0';
+                    }
+                };
+                await updateCount();
+                // Listener realtime para atualizar contador
+                const channel = client.channel('realtime-comments-count-' + post.id);
+                channel.on(
+                  'postgres_changes',
+                  { event: '*', schema: 'public', table: 'comentarios_posts', filter: `post_id=eq.${post.id}` },
+                  () => {
+                    updateCount();
+                  }
+                );
+                channel.subscribe();
+            });
+            // Evento para abrir caixa de comentário
+            btnComentar.addEventListener('click', function(e) {
+                e.stopPropagation(); // Evita propagação para outros elementos
+                if (window.showCommentModal) {
+                    window.showCommentModal(post.id);
+                }
+            });
             actionsDiv.appendChild(btnCurtir);
             actionsDiv.appendChild(btnComentar);
             postDiv.appendChild(actionsDiv);
