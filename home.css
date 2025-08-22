@@ -1,3 +1,47 @@
+/* Filtros estilo Reddit no topo do main-content */
+.main-content-filters {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #23272f;
+  padding: 0 0 8px 0;
+  border-bottom: 1px solid #353942;
+}
+.main-content-filters ul {
+  display: flex;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 12px 24px 0 24px;
+}
+.main-content-filters li {
+  display: flex;
+}
+.filter-btn {
+  background: #353942;
+  color: #b8c7d1;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 22px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.filter-btn.active,
+.filter-btn:hover,
+.filter-btn:focus {
+  background: #5865f2;
+  color: #fff;
+  outline: none;
+}
+html, body {
+  height: 100vh;
+  overflow: hidden;
+}
 /* Limite de largura para o corpo da postagem */
 .postBody {
   max-height: 400px;
@@ -401,7 +445,7 @@ h1{
     width: 100%;
     height: 100%;
     background: #23272f;
-    padding: 24px 16px 0 0;
+  padding: 24px 16px 0 16px;
     box-sizing: border-box;
     border-left: 1px solid #2d3b49;
     z-index: 1;

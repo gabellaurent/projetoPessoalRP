@@ -1,3 +1,141 @@
+// Função para filtrar postagens conforme o filtro selecionado
+export async function filtrarPostagensFeed(tipo = 'hot') {
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+    let feedContent = document.getElementById('feed-content');
+    if (!feedContent) {
+        feedContent = document.createElement('div');
+        feedContent.id = 'feed-content';
+        mainContent.appendChild(feedContent);
+    }
+    feedContent.innerHTML = '';
+    let posts = [];
+    if (window.supabaseClient && typeof window.supabaseClient.load === 'function') {
+        await new Promise(resolve => {
+            window.supabaseClient.load(async function(client) {
+                // Busca posts e likes/comentários
+                const { data, error } = await client
+                    .from('posts')
+                    .select('id, titulo, post_content, author, author_id, created_at')
+                    .order('created_at', { ascending: false })
+                    .limit(30);
+                if (data && data.length > 0) {
+                    posts = data;
+                }
+                // Busca likes e comentários para HOT/TOP
+                if (tipo === 'hot' || tipo === 'top') {
+                    // Likes
+                    const { data: likesData } = await client
+                        .from('likes')
+                        .select('id, post_id');
+                    // Comentários
+                    const { data: commentsData } = await client
+                        .from('comentarios_posts')
+                        .select('id, post_id');
+                    // Conta likes e comentários por post
+                    posts.forEach(post => {
+                        post.likes = likesData ? likesData.filter(l => l.post_id === post.id).length : 0;
+                        post.comments = commentsData ? commentsData.filter(c => c.post_id === post.id).length : 0;
+                    });
+                }
+                // Ordenação conforme filtro
+                if (tipo === 'new') {
+                    posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                } else if (tipo === 'hot') {
+                    posts.sort((a, b) => ((b.likes + b.comments) - (a.likes + a.comments)));
+                } else if (tipo === 'top') {
+                    posts.sort((a, b) => b.likes - a.likes);
+                }
+                resolve();
+            });
+        });
+    }
+    // Renderiza posts (igual renderPostagensFeed, mas usando posts filtrados)
+    if (posts.length === 0) {
+        const h1 = document.createElement('h1');
+        h1.textContent = 'titulo da postagem';
+        const p = document.createElement('p');
+        p.innerHTML = 'corpo da postagem';
+        feedContent.appendChild(h1);
+        feedContent.appendChild(p);
+    } else {
+        posts.forEach((post, idx) => {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post-item fadein-post';
+            postDiv.style.animationDelay = (idx * 100) + 'ms';
+            const h1 = document.createElement('h1');
+            h1.classList.add('fadein-post');
+            h1.style.animationDelay = (idx * 100) + 'ms';
+            let dataFormatada = '';
+            if (post.created_at) {
+                const d = new Date(post.created_at);
+                dataFormatada = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+            h1.innerHTML = `<span style="font-weight:bold;">${post.titulo || 'titulo da postagem'}</span> <span style="font-size:0.9rem;color:#bbb;margin-left:12px;">por <a href="#" class="user-link" style="color:#8ab4f8;text-decoration:underline;" data-userid="${post.author_id}">${post.author || 'usuário'}</a> • ${dataFormatada}</span>`;
+            const postBodyDiv = document.createElement('div');
+            postBodyDiv.className = 'postBody';
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = post.post_content || 'corpo da postagem';
+            contentDiv.classList.add('fadein-post', 'post-content');
+            contentDiv.style.animationDelay = (idx * 100 + 50) + 'ms';
+            postBodyDiv.appendChild(contentDiv);
+            postDiv.appendChild(h1);
+            postDiv.appendChild(postBodyDiv);
+            // Botões de curtir e comentar
+            const actionsDiv = document.createElement('div');
+            actionsDiv.style.display = 'flex';
+            actionsDiv.style.justifyContent = 'flex-start';
+            actionsDiv.style.gap = '12px';
+            actionsDiv.style.marginBottom = '8px';
+            // Botão curtir
+            const btnCurtir = document.createElement('button');
+            btnCurtir.className = 'btn-curtir';
+            btnCurtir.style.padding = '6px 12px';
+            btnCurtir.style.borderRadius = '50%';
+            btnCurtir.style.border = 'none';
+            btnCurtir.style.background = 'transparent';
+            btnCurtir.style.cursor = 'pointer';
+            btnCurtir.style.display = 'flex';
+            btnCurtir.style.alignItems = 'center';
+            btnCurtir.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e25555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6c-1.5-1.7-4.1-1.7-5.6 0l-.7.8-.7-.8c-1.5-1.7-4.1-1.7-5.6 0-1.6 1.8-1.6 4.6 0 6.4l.7.8 5.6 6.1 5.6-6.1.7-.8c1.6-1.8 1.6-4.6 0-6.4z"></path></svg>`;
+            const likesCount = document.createElement('span');
+            likesCount.className = 'likes-count';
+            likesCount.textContent = post.likes || '0';
+            likesCount.style.marginLeft = '6px';
+            likesCount.style.fontWeight = 'bold';
+            likesCount.style.color = '#e25555';
+            btnCurtir.appendChild(likesCount);
+            // Botão comentar
+            const btnComentar = document.createElement('button');
+            btnComentar.className = 'btn-comentar';
+            btnComentar.style.padding = '6px 12px';
+            btnComentar.style.borderRadius = '50%';
+            btnComentar.style.border = 'none';
+            btnComentar.style.background = 'transparent';
+            btnComentar.style.cursor = 'pointer';
+            btnComentar.style.display = 'flex';
+            btnComentar.style.alignItems = 'center';
+            btnComentar.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+            const commentsCount = document.createElement('span');
+            commentsCount.className = 'comments-count';
+            commentsCount.textContent = post.comments || '0';
+            commentsCount.style.marginLeft = '6px';
+            commentsCount.style.fontWeight = 'bold';
+            commentsCount.style.color = '#6366f1';
+            btnComentar.appendChild(commentsCount);
+            actionsDiv.appendChild(btnCurtir);
+            actionsDiv.appendChild(btnComentar);
+            postDiv.appendChild(actionsDiv);
+            // HR após ações
+            const hrAcoes = document.createElement('hr');
+            hrAcoes.style.margin = '8px 0 16px 0';
+            hrAcoes.style.border = 'none';
+            hrAcoes.style.borderTop = '1px solid #2d3b49';
+            postDiv.appendChild(hrAcoes);
+            feedContent.appendChild(postDiv);
+        });
+    }
+}
 // Função para buscar e exibir todas as postagens no main-content
 // Função incremental para adicionar apenas novas postagens ao feed
 export async function adicionarNovasPostagensFeed(postIdsExibidos = []) {

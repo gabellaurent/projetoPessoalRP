@@ -11,6 +11,23 @@
         }
     }
 window.addEventListener('DOMContentLoaded', function() {
+    // Controle dos filtros do main-content (Reddit style)
+    const filterNav = document.getElementById('main-content-filters');
+    if (filterNav) {
+        import('./postagensFeed.js').then(({ filtrarPostagensFeed }) => {
+            filterNav.addEventListener('click', function(e) {
+                const btn = e.target.closest('.filter-btn');
+                if (btn) {
+                    // Remove 'active' de todos os botões
+                    filterNav.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    // Adiciona 'active' ao botão clicado
+                    btn.classList.add('active');
+                    // Chama a função de filtro
+                    filtrarPostagensFeed(btn.dataset.filter);
+                }
+            });
+        });
+    }
     // Verifica sessão ativa do Supabase antes de carregar o conteúdo
     function checkAuthAndContinue(callback) {
         function proceed(client) {
